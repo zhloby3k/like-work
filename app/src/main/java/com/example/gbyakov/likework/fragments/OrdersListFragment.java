@@ -22,13 +22,16 @@ public class OrdersListFragment extends Fragment {
     public static ListView list;
 
     static {
-        orders.add(new Order("08.12.15", "HIGHLANDER - Е 287 ТА 159", "Цыбина Елена Владимировна", "Диагностика", "64 000,00"));
-        orders.add(new Order("18.12.15", "COROLLA - Е 571 ЕО 159", "Третьяков Алексей Юрьевич", "ТО - 20 000 км", "13 504,00"));
-        orders.add(new Order("04.12.15", "HILUX - Е 347 РН 159", "Сулейманов Сахават Абасат Оглы", "ТО - 30 000 км", "107 776,23"));
-        orders.add(new Order("09.12.15", "RAV4 - В 210 СА 159", "Тюрин Владимир Анатольевич", "ТО - 1 мес.", "81 709,84"));
-        orders.add(new Order("11.11.15", "LC 200 - Е 610 ЕТ 159", "Харченко Александр Владимирович", "Диагностика", "126 936,00"));
-        orders.add(new Order("28.10.15", "CAMRY - Т 223 КА 159", "Смирнов Юрий Владимирович", "МАСЛО МОТОРНОЕ И ФИЛЬТР - ЗАМЕНА", "15 830,00"));
-        orders.add(new Order("02.11.15", "RAV4 - А 677 ОХ 159", "Глонина Ольга Леонидовна", "ТО - 80 000 км.", "81 709,84"));
+        orders.add(new Order("", "", "", "Запись", ""));
+        orders.add(new Order("08.12.15", "HIGHLANDER - Е 287 ТА 159", "Цыбина Елена Владимировна", "Доведено записан", "64 000,00"));
+        orders.add(new Order("18.12.15", "COROLLA - Е 571 ЕО 159", "Третьяков Алексей Юрьевич", "Не доведено/не согласовано", "13 504,00"));
+        orders.add(new Order("04.12.15", "HILUX - Е 347 РН 159", "Сулейманов Сахават Абасат Оглы", "Не доведено", "107 776,23"));
+        orders.add(new Order("", "", "", "Запчасти", ""));
+        orders.add(new Order("09.12.15", "RAV4 - В 210 СА 159", "Тюрин Владимир Анатольевич", "Запчасти заказаны", "81 709,84"));
+        orders.add(new Order("11.11.15", "LC 200 - Е 610 ЕТ 159", "Харченко Александр Владимирович", "Запчасти, ожидание", "126 936,00"));
+        orders.add(new Order("28.10.15", "CAMRY - Т 223 КА 159", "Смирнов Юрий Владимирович", "Запчасти, ожидание", "15 830,00"));
+        orders.add(new Order("", "", "", "Калькуляция (расчетный отдел)", ""));
+        orders.add(new Order("02.11.15", "RAV4 - А 677 ОХ 159", "Глонина Ольга Леонидовна", "Запчасти заказаны", "81 709,84"));
     }
 
     @Override
@@ -49,14 +52,14 @@ public class OrdersListFragment extends Fragment {
         public final String date;
         public final String car;
         public final String client;
-        public final String details;
+        public final String status;
         public final String sum;
 
-        public Order(String date, String car, String client, String details, String sum) {
+        public Order(String date, String car, String client, String status, String sum) {
             this.date   = date;
             this.car    = car;
             this.client = client;
-            this.details= details;
+            this.status = status;
             this.sum    = sum;
 
         }
@@ -73,19 +76,28 @@ public class OrdersListFragment extends Fragment {
             Order Order = getItem(position);
 
             if (convertView == null) {
-                convertView = LayoutInflater.from(getContext())
-                        .inflate(R.layout.list_item_orders, null);
+                if (Order.date == "") {
+                    convertView = LayoutInflater.from(getContext())
+                            .inflate(R.layout.list_item_orders_status, null);
+                    ((TextView) convertView.findViewById(R.id.list_item_order_group))
+                            .setText(Order.status);
+                }
+                else {
+                    convertView = LayoutInflater.from(getContext())
+                            .inflate(R.layout.list_item_orders, null);
+                    ((TextView) convertView.findViewById(R.id.list_item_order_date))
+                            .setText(Order.date);
+                    ((TextView) convertView.findViewById(R.id.list_item_order_car))
+                            .setText(Order.car);
+                    ((TextView) convertView.findViewById(R.id.list_item_order_client))
+                            .setText(Order.client);
+                    ((TextView) convertView.findViewById(R.id.list_item_order_status))
+                            .setText(Order.status);
+                    ((TextView) convertView.findViewById(R.id.list_item_order_sum))
+                            .setText(Order.sum);
+                }
             }
-            ((TextView) convertView.findViewById(R.id.list_item_order_date))
-                    .setText(Order.date);
-            ((TextView) convertView.findViewById(R.id.list_item_order_car))
-                    .setText(Order.car);
-            ((TextView) convertView.findViewById(R.id.list_item_order_client))
-                    .setText(Order.client);
-            ((TextView) convertView.findViewById(R.id.list_item_order_details))
-                    .setText(Order.details);
-            ((TextView) convertView.findViewById(R.id.list_item_order_sum))
-                    .setText(Order.sum);
+
             return convertView;
         }
     }

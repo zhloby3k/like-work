@@ -5,7 +5,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:layout_height="wrap_content"
-    android:minHeight="?android:attr/listPreferredItemHeight">
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:gravity="center_vertical">
 
     <FrameLayout
         android:layout_width="40dp"
@@ -34,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="HIGHLANDER - Е 287 ТА 159"
-            style="@style/TextAppearance.AppCompat.Subhead"
+            style="@style/TextAppearance.AppCompat.Body2"
             />
 
         <TextView
@@ -42,14 +43,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Цыбина Елена Владимировна"
-            style="@style/TextAppearance.AppCompat.Body2" />
+            style="@style/TextAppearance.AppCompat.Body1" />
 
         <TextView
             android:id="@+id/list_item_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="ТО - 20 000 км"
-            style="@style/TextAppearance.AppCompat.Body1" />
+            style="@style/TextAppearance.AppCompat.Caption" />
 
     </LinearLayout>
 

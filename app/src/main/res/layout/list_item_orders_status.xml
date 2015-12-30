@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="@color/ColorTabs"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:layout_height="96dp">
+
+    <TextView
+        android:id="@+id/list_item_order_group"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="Запись"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:gravity="center_vertical"
+        android:textColor="@color/colorPrimaryDark" />
+
+</LinearLayout>
