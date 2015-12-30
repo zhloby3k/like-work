@@ -9,7 +9,7 @@
     tools:context="com.example.gbyakov.likework.fragments.RecordsListFragment">
 
     <ListView
-         android:id="@+id/records_listview"
+        android:id="@+id/records_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@null" />
