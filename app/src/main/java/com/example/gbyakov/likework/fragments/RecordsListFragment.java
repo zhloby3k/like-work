@@ -17,18 +17,18 @@ import java.util.List;
 
 public class RecordsListFragment extends Fragment {
 
-    private static final List<Record> cats = new ArrayList<Record>();
+    private static final List<Record> records = new ArrayList<Record>();
     public static ListView list;
 
     static {
-        cats.add(new Record("08:00", "HIGHLANDER - Е 287 ТА 159", "Цыбина Елена Владимировна", "Диагностика"));
-        cats.add(new Record("09:00", "COROLLA - Е 571 ЕО 159", "Третьяков Алексей Юрьевич", "ТО - 20 000 км"));
-        cats.add(new Record("10:00", "HILUX - Е 347 РН 159", "Сулейманов Сахават Абасат Оглы", "ТО - 30 000 км"));
-        cats.add(new Record("11:00", "", "", ""));
-        cats.add(new Record("12:00", "RAV4 - В 210 СА 159", "Тюрин Владимир Анатольевич", "ТО - 1 мес."));
-        cats.add(new Record("13:00", "LC 200 - Е 610 ЕТ 159", "Харченко Александр Владимирович", "Диагностика"));
-        cats.add(new Record("14:00", "CAMRY - Т 223 КА 159", "Смирнов Юрий Владимирович", "МАСЛО МОТОРНОЕ И ФИЛЬТР - ЗАМЕНА"));
-        cats.add(new Record("15:00", "RAV4 - А 677 ОХ 159", "Глонина Ольга Леонидовна", "ТО - 80 000 км."));
+        records.add(new Record("08:00", "HIGHLANDER - Е 287 ТА 159", "Цыбина Елена Владимировна", "Диагностика"));
+        records.add(new Record("09:00", "COROLLA - Е 571 ЕО 159", "Третьяков Алексей Юрьевич", "ТО - 20 000 км"));
+        records.add(new Record("10:00", "HILUX - Е 347 РН 159", "Сулейманов Сахават Абасат Оглы", "ТО - 30 000 км"));
+        records.add(new Record("11:00", "", "", ""));
+        records.add(new Record("12:00", "RAV4 - В 210 СА 159", "Тюрин Владимир Анатольевич", "ТО - 1 мес."));
+        records.add(new Record("13:00", "LC 200 - Е 610 ЕТ 159", "Харченко Александр Владимирович", "Диагностика"));
+        records.add(new Record("14:00", "CAMRY - Т 223 КА 159", "Смирнов Юрий Владимирович", "МАСЛО МОТОРНОЕ И ФИЛЬТР - ЗАМЕНА"));
+        records.add(new Record("15:00", "RAV4 - А 677 ОХ 159", "Глонина Ольга Леонидовна", "ТО - 80 000 км."));
     }
 
     @Override
@@ -60,7 +60,7 @@ public class RecordsListFragment extends Fragment {
     private class RecordAdapter extends ArrayAdapter<Record> {
 
         public RecordAdapter(Context context) {
-            super(context, R.layout.list_item_records, cats);
+            super(context, R.layout.list_item_records, records);
         }
 
         @Override
