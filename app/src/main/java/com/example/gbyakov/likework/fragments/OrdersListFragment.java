@@ -30,8 +30,14 @@ public class OrdersListFragment extends Fragment {
         orders.add(new Order("09.12.15", "RAV4 - В 210 СА 159", "Тюрин Владимир Анатольевич", "Запчасти заказаны", "81 709,84"));
         orders.add(new Order("11.11.15", "LC 200 - Е 610 ЕТ 159", "Харченко Александр Владимирович", "Запчасти, ожидание", "126 936,00"));
         orders.add(new Order("28.10.15", "CAMRY - Т 223 КА 159", "Смирнов Юрий Владимирович", "Запчасти, ожидание", "15 830,00"));
+        orders.add(new Order("30.11.15", "RAV4 - А 677 ОХ 159", "Глонина Ольга Леонидовна", "Запчасти заказаны", "81 709,84"));
         orders.add(new Order("", "", "", "Калькуляция (расчетный отдел)", ""));
-        orders.add(new Order("02.11.15", "RAV4 - А 677 ОХ 159", "Глонина Ольга Леонидовна", "Запчасти заказаны", "81 709,84"));
+        orders.add(new Order("08.12.15", "HIGHLANDER - Е 287 ТА 159", "Цыбина Елена Владимировна", "Доведено записан", "64 000,00"));
+        orders.add(new Order("", "", "", "В работе", ""));
+        orders.add(new Order("12.12.15", "RAV4 - В 230 СА 159", "Мартыненко Владимир Анатольевич", "Выполнение работ", "81 705,84"));
+        orders.add(new Order("22.11.15", "LC 200 - Е 410 ЕТ 159", "Васильченко Александр Владимирович", "Выполнение работ", "127 936,00"));
+        orders.add(new Order("31.10.15", "CAMRY - Т 253 КА 159", "Шатров Юрий Владимирович", "Выполнение работ", "85 813,00"));
+        orders.add(new Order("18.12.15", "COROLLA - Е 341 ЕО 159", "Иванов Алексей Юрьевич", "Выполнение работ", "23 504,00"));
     }
 
     @Override
@@ -75,7 +81,6 @@ public class OrdersListFragment extends Fragment {
         public View getView(int position, View convertView, ViewGroup parent) {
             Order Order = getItem(position);
 
-            if (convertView == null) {
                 if (Order.date == "") {
                     convertView = LayoutInflater.from(getContext())
                             .inflate(R.layout.list_item_orders_status, null);
@@ -96,7 +101,6 @@ public class OrdersListFragment extends Fragment {
                     ((TextView) convertView.findViewById(R.id.list_item_order_sum))
                             .setText(Order.sum);
                 }
-            }
 
             return convertView;
         }

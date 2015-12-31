@@ -19,7 +19,9 @@
             android:layout_height="wrap_content"
             android:text="HIGHLANDER - Е 287 ТА 159"
             style="@style/TextAppearance.AppCompat.Body2"
-            android:layout_weight="2" />
+            android:layout_weight="2"
+            android:ellipsize="end"
+            android:singleLine="true" />
 
         <TextView
             android:id="@+id/list_item_call_date"
@@ -37,13 +39,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Цыбина Елена Владимировна"
-        style="@style/TextAppearance.AppCompat.Body1" />
+        style="@style/TextAppearance.AppCompat.Body1"
+        android:ellipsize="end"
+        android:singleLine="true" />
 
     <TextView
         android:id="@+id/list_item_call_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="ТО - 20 000 км"
-        style="@style/TextAppearance.AppCompat.Caption" />
+        style="@style/TextAppearance.AppCompat.Caption"
+        android:ellipsize="end"
+        android:singleLine="true" />
 
 </LinearLayout>

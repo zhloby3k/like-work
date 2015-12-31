@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -21,14 +22,17 @@ public class RecordsListFragment extends Fragment {
     public static ListView list;
 
     static {
-        records.add(new Record("08:00", "HIGHLANDER - Е 287 ТА 159", "Цыбина Елена Владимировна", "Диагностика"));
-        records.add(new Record("09:00", "COROLLA - Е 571 ЕО 159", "Третьяков Алексей Юрьевич", "ТО - 20 000 км"));
-        records.add(new Record("10:00", "HILUX - Е 347 РН 159", "Сулейманов Сахават Абасат Оглы", "ТО - 30 000 км"));
-        records.add(new Record("11:00", "", "", ""));
-        records.add(new Record("12:00", "RAV4 - В 210 СА 159", "Тюрин Владимир Анатольевич", "ТО - 1 мес."));
-        records.add(new Record("13:00", "LC 200 - Е 610 ЕТ 159", "Харченко Александр Владимирович", "Диагностика"));
-        records.add(new Record("14:00", "CAMRY - Т 223 КА 159", "Смирнов Юрий Владимирович", "МАСЛО МОТОРНОЕ И ФИЛЬТР - ЗАМЕНА"));
-        records.add(new Record("15:00", "RAV4 - А 677 ОХ 159", "Глонина Ольга Леонидовна", "ТО - 80 000 км."));
+        records.add(new Record("08:00", "HIGHLANDER - Е 287 ТА 159", "Цыбина Елена Владимировна", "Диагностика", true));
+        records.add(new Record("09:00", "COROLLA - Е 571 ЕО 159", "Третьяков Алексей Юрьевич", "ТО - 20 000 км", true));
+        records.add(new Record("10:00", "HILUX - Е 347 РН 159", "Сулейманов Сахават Абасат Оглы", "ТО - 30 000 км", true));
+        records.add(new Record("11:00", "", "", "", false));
+        records.add(new Record("12:00", "RAV4 - В 210 СА 159", "Тюрин Владимир Анатольевич", "ТО - 1 мес.", false));
+        records.add(new Record("13:00", "LC 200 - Е 610 ЕТ 159", "Харченко Александр Владимирович", "Диагностика", false));
+        records.add(new Record("14:00", "CAMRY - Т 223 КА 159", "Смирнов Юрий Владимирович", "МАСЛО МОТОРНОЕ И ФИЛЬТР - ЗАМЕНА", true));
+        records.add(new Record("15:00", "RAV4 - А 677 ОХ 159", "Глонина Ольга Леонидовна", "ТО - 80 000 км.", false));
+        records.add(new Record("16:00", "HIGHLANDER - Е 287 ТА 159", "Цыбина Елена Владимировна", "Диагностика", false));
+        records.add(new Record("17:00", "COROLLA - Е 571 ЕО 159", "Третьяков Алексей Юрьевич", "ТО - 20 000 км", false));
+        records.add(new Record("18:00", "HILUX - Е 347 РН 159", "Сулейманов Сахават Абасат Оглы", "ТО - 30 000 км", true));
     }
 
     @Override
@@ -48,12 +52,14 @@ public class RecordsListFragment extends Fragment {
         public final String car;
         public final String client;
         public final String details;
+        public final boolean done;
 
-        public Record(String time, String car, String client, String details) {
+        public Record(String time, String car, String client, String details, boolean done) {
             this.time   = time;
             this.car    = car;
             this.client = client;
             this.details= details;
+            this.done   = done;
         }
     }
 
@@ -79,6 +85,12 @@ public class RecordsListFragment extends Fragment {
                     .setText(Record.client);
             ((TextView) convertView.findViewById(R.id.list_item_details))
                     .setText(Record.details);
+
+            if (Record.done) {
+                ((ImageView) convertView.findViewById(R.id.list_item_status))
+                        .setImageResource(R.drawable.ic_check);
+            }
+
             return convertView;
         }
     }

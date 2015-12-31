@@ -68,7 +68,7 @@ public class RecordsTabFragment extends Fragment {
             switch (position){
                 case 0 : return "Сегодня";
                 case 1 : return "Завтра";
-                case 2 : return "После завтра";
+                case 2 : return "Послезавтра";
             }
             return null;
         }
