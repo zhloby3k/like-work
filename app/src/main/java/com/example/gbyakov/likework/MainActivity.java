@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.example.gbyakov.likework.fragments.CallsListFragment;
 import com.example.gbyakov.likework.fragments.OrdersListFragment;
 import com.example.gbyakov.likework.fragments.RecordsTabFragment;
 
@@ -64,7 +65,8 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.container, new OrdersListFragment()).commit();
         } else if (id == R.id.nav_calls) {
-
+            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.container, new CallsListFragment()).commit();
         } else if (id == R.id.nav_settings) {
 
         }

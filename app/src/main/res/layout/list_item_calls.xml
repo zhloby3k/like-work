@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:layout_height="wrap_content"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:gravity="center_vertical">
+
+    <LinearLayout
+        android:layout_height="fill_parent"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent">
+
+        <TextView
+            android:id="@+id/list_item_call_car"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="HIGHLANDER - Е 287 ТА 159"
+            style="@style/TextAppearance.AppCompat.Body2"
+            android:layout_weight="2" />
+
+        <TextView
+            android:id="@+id/list_item_call_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="09.12.15"
+            style="@style/TextAppearance.AppCompat.Body2"
+            android:gravity="right"
+            android:layout_weight="6" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/list_item_call_client"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Цыбина Елена Владимировна"
+        style="@style/TextAppearance.AppCompat.Body1" />
+
+    <TextView
+        android:id="@+id/list_item_call_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ТО - 20 000 км"
+        style="@style/TextAppearance.AppCompat.Caption" />
+
+</LinearLayout>
