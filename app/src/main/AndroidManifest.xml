@@ -17,6 +17,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:authorities="com.example.gbyakov.likework"
+            android:name=".data.LikeWorkProvider"
+            android:exported="false"
+            android:syncable="true" />
     </application>
 
 </manifest>
