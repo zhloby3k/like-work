@@ -1,8 +1,6 @@
 package com.example.gbyakov.likework.fragments;
 
-import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -17,7 +15,6 @@ import android.widget.ListView;
 import com.example.gbyakov.likework.R;
 import com.example.gbyakov.likework.adapters.OrderAdapter;
 import com.example.gbyakov.likework.data.LikeWorkContract;
-import com.example.gbyakov.likework.data.LikeWorkDBHelper;
 
 public class OrdersListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>  {
 

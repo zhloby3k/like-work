@@ -1,9 +1,6 @@
 package com.example.gbyakov.likework.fragments;
 
-import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -13,18 +10,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.example.gbyakov.likework.R;
 import com.example.gbyakov.likework.adapters.RecordAdapter;
 import com.example.gbyakov.likework.data.LikeWorkContract;
-import com.example.gbyakov.likework.data.LikeWorkDBHelper;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RecordsListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>  {
 
@@ -49,9 +39,9 @@ public class RecordsListFragment extends Fragment implements LoaderManager.Loade
 
         mRecordAdapter = new RecordAdapter(getActivity(), null, 0);
 
-        View x = inflater.inflate(R.layout.fragment_orders_list, container, false);
+        View x = inflater.inflate(R.layout.fragment_records_list, container, false);
 
-        mListView = (ListView) x.findViewById(R.id.orders_listview);
+        mListView = (ListView) x.findViewById(R.id.records_listview);
         mListView.setAdapter(mRecordAdapter);
 
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Запись");
