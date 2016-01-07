@@ -72,6 +72,7 @@ public class LikeWorkContract {
         public static final String COLUMN_TYPE          = "type";
         public static final String COLUMN_REASON        = "reason";
         public static final String COLUMN_SUM           = "sum";
+        public static final String COLUMN_DONE          = "done";
 
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);

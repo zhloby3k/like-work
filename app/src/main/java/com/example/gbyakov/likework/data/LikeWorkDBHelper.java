@@ -13,7 +13,7 @@ import com.example.gbyakov.likework.data.LikeWorkContract.StatusEntry;
 
 public class LikeWorkDBHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     static final String DATABASE_NAME = "likework.db";
 
@@ -49,7 +49,8 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
                 RecordEntry.COLUMN_CUSTOMER_ID + " TEXT NOT NULL, " +
                 RecordEntry.COLUMN_TYPE + " TEXT NOT NULL, " +
                 RecordEntry.COLUMN_REASON + " TEXT NOT NULL, " +
-                RecordEntry.COLUMN_SUM + " REAL NOT NULL " +
+                RecordEntry.COLUMN_SUM + " REAL NOT NULL, " +
+                RecordEntry.COLUMN_DONE + " INTEGER NOT NULL " +
                 " );";
 
         final String SQL_CREATE_CALL_TABLE = "CREATE TABLE " + CallEntry.TABLE_NAME + " (" +
@@ -97,13 +98,18 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        db.execSQL("DROP TABLE IF EXISTS " + OrderEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + RecordEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + CallEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + CarEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + ClientEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + StatusEntry.TABLE_NAME);
-        onCreate(db);
+        if (oldVersion == 1) {
+            db.execSQL("ALTER TABLE " + RecordEntry.TABLE_NAME + " ADD COLUMN " + RecordEntry.COLUMN_DONE + " INTEGER ");
+        }
+        else {
+            db.execSQL("DROP TABLE IF EXISTS " + OrderEntry.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + RecordEntry.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + CallEntry.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + CarEntry.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + ClientEntry.TABLE_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + StatusEntry.TABLE_NAME);
+            onCreate(db);
+        }
 
     }
 }
