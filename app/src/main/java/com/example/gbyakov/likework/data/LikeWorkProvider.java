@@ -15,6 +15,8 @@ import com.example.gbyakov.likework.data.LikeWorkContract.CarEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.ClientEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.StatusEntry;
 
+import java.util.ArrayList;
+
 public class LikeWorkProvider extends ContentProvider {
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -68,28 +70,40 @@ public class LikeWorkProvider extends ContentProvider {
             {
                 SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
                 qBuilder.setTables(OrderEntry.TABLE_NAME +
-                        " LEFT JOIN " + CarEntry.TABLE_NAME +
-                        " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_CAR_ID +
-                        " = " + CarEntry.TABLE_NAME + "." + CarEntry.COLUMN_ID_1C +
-                        " LEFT JOIN " + ClientEntry.TABLE_NAME + " AS Client" +
-                        " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_CLIENT_ID +
-                        " = Client." + ClientEntry.COLUMN_ID_1C +
-                        " LEFT JOIN " + ClientEntry.TABLE_NAME + " AS Customer" +
-                        " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_CUSTOMER_ID +
-                        " = Customer." + ClientEntry.COLUMN_ID_1C +
-                        " LEFT JOIN " + StatusEntry.TABLE_NAME +
-                        " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_STATUS_ID +
-                        " = " + StatusEntry.TABLE_NAME + "." + StatusEntry._ID
+                                " LEFT JOIN " + CarEntry.TABLE_NAME +
+                                " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_CAR_ID +
+                                " = " + CarEntry.TABLE_NAME + "." + CarEntry.COLUMN_ID_1C +
+                                " LEFT JOIN " + ClientEntry.TABLE_NAME + " AS Client" +
+                                " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_CLIENT_ID +
+                                " = Client." + ClientEntry.COLUMN_ID_1C +
+                                " LEFT JOIN " + ClientEntry.TABLE_NAME + " AS Customer" +
+                                " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_CUSTOMER_ID +
+                                " = Customer." + ClientEntry.COLUMN_ID_1C +
+                                " LEFT JOIN " + StatusEntry.TABLE_NAME +
+                                " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_STATUS_ID +
+                                " = " + StatusEntry.TABLE_NAME + "." + StatusEntry._ID
                 );
 
-                retCursor = qBuilder.query(mOpenHelper.getReadableDatabase(),
-                        projection,
-                        selection,
-                        selectionArgs,
-                        StatusEntry.TABLE_NAME + "." + StatusEntry.COLUMN_GROUP,
-                        null,
-                        sortOrder
-                );
+                ArrayList<String> projectionListItems = new ArrayList<>();
+                ArrayList<String> projectionListGroup = new ArrayList<>(projectionListItems);
+                for (int i=0; i<projection.length; i++) {
+                    projectionListItems.add(projection[i]);
+                    projectionListGroup.add((projection[i].equals(StatusEntry.COLUMN_GROUP)) ? StatusEntry.COLUMN_GROUP : "null");
+                }
+
+                projectionListItems.add("0 isGroup");
+                String[] projectionItems = projectionListItems.toArray(new String[projectionListItems.size()]);
+                String qItems = qBuilder.buildQuery(projectionItems, selection, null, null, null, null);
+
+                projectionListGroup.add("1");
+                String[] projectionGroup = projectionListGroup.toArray(new String[projectionListGroup.size()]);
+                String qGroups = qBuilder.buildQuery(projectionGroup, selection, StatusEntry.COLUMN_GROUP, null, null, null);
+
+                String[] subQueries = {qItems, qGroups};
+
+                String qUnion = qBuilder.buildUnionQuery(subQueries, sortOrder + ", isGroup DESC", null);
+
+                retCursor = mOpenHelper.getReadableDatabase().rawQuery(qUnion, selectionArgs);
                 break;
             }
             case RECORD:
