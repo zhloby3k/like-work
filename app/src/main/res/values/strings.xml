@@ -2,4 +2,11 @@
     <string name="app_name">like@work</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="prompt_login">Имя пользователя</string>
+    <string name="prompt_password">Пароль</string>
+    <string name="action_sign_in">Войти</string>
+    <string name="error_username_required">Необходимо ввести имя пользователя</string>
+    <string name="error_password_incorrect">Неверный пароль</string>
+    <string name="error_password_required">Необходимо ввести пароль</string>
+    <string name="ws_link">http://sr00038.md.mash-dvor.ru/alfa_green/ws/mobile.1cws</string>
 </resources>
