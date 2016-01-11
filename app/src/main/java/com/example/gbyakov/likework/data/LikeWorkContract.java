@@ -153,6 +153,7 @@ public class LikeWorkContract {
 
         public static final String TABLE_NAME           = "statuses";
 
+        public static final String COLUMN_ID_1C         = "_id_1c";
         public static final String COLUMN_NAME          = "status_name";
         public static final String COLUMN_COLOR         = "color";
         public static final String COLUMN_GROUP         = "group_name";

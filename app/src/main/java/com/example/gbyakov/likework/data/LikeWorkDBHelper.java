@@ -4,11 +4,11 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.gbyakov.likework.data.LikeWorkContract.OrderEntry;
-import com.example.gbyakov.likework.data.LikeWorkContract.RecordEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.CallEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.CarEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.ClientEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.OrderEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.RecordEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.StatusEntry;
 
 public class LikeWorkDBHelper extends SQLiteOpenHelper {
@@ -81,6 +81,7 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_STATUS_TABLE = "CREATE TABLE " + StatusEntry.TABLE_NAME + " (" +
                 StatusEntry._ID + " INTEGER PRIMARY KEY," +
+                StatusEntry.COLUMN_ID_1C + " TEXT NOT NULL, " +
                 StatusEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                 StatusEntry.COLUMN_COLOR + " TEXT NOT NULL, " +
                 StatusEntry.COLUMN_GROUP + " TEXT NOT NULL " +
