@@ -8,11 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
-import com.example.gbyakov.likework.data.LikeWorkContract.OrderEntry;
-import com.example.gbyakov.likework.data.LikeWorkContract.RecordEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.CallEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.CarEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.ClientEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.OrderEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.RecordEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.StatusEntry;
 
 import java.util.ArrayList;
@@ -24,9 +24,10 @@ public class LikeWorkProvider extends ContentProvider {
 
     static final int ORDER              = 100;
     static final int ORDER_ID           = 101;
+    static final int ORDER_WITH_GROUPS  = 110;
     static final int RECORD             = 200;
     static final int RECORD_ID          = 201;
-    static final int RECORD_WITH_DATE   = 210;
+    static final int RECORD_DATES       = 210;
     static final int CALL               = 300;
     static final int CALL_ID            = 301;
 
@@ -39,17 +40,18 @@ public class LikeWorkProvider extends ContentProvider {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = LikeWorkContract.CONTENT_AUTHORITY;
 
-        matcher.addURI(authority, LikeWorkContract.PATH_ORDER,          ORDER);
-        matcher.addURI(authority, LikeWorkContract.PATH_ORDER + "/#",   ORDER_ID);
-        matcher.addURI(authority, LikeWorkContract.PATH_RECORD,         RECORD);
-        matcher.addURI(authority, LikeWorkContract.PATH_RECORD + "/*",  RECORD_WITH_DATE);
-        matcher.addURI(authority, LikeWorkContract.PATH_RECORD + "/#",  RECORD_ID);
-        matcher.addURI(authority, LikeWorkContract.PATH_CALL,           CALL);
-        matcher.addURI(authority, LikeWorkContract.PATH_CALL + "/#",    CALL_ID);
+        matcher.addURI(authority, LikeWorkContract.PATH_ORDER,                  ORDER);
+        matcher.addURI(authority, LikeWorkContract.PATH_ORDER + "/#",           ORDER_ID);
+        matcher.addURI(authority, LikeWorkContract.PATH_ORDER + "/withgroups",  ORDER_WITH_GROUPS);
+        matcher.addURI(authority, LikeWorkContract.PATH_RECORD,                 RECORD);
+        matcher.addURI(authority, LikeWorkContract.PATH_RECORD + "/dates",      RECORD_DATES);
+        matcher.addURI(authority, LikeWorkContract.PATH_RECORD + "/#",          RECORD_ID);
+        matcher.addURI(authority, LikeWorkContract.PATH_CALL,                   CALL);
+        matcher.addURI(authority, LikeWorkContract.PATH_CALL + "/#",            CALL_ID);
 
-        matcher.addURI(authority, LikeWorkContract.PATH_CAR,            CAR);
-        matcher.addURI(authority, LikeWorkContract.PATH_CLIENT,         CLIENT);
-        matcher.addURI(authority, LikeWorkContract.PATH_STATUS,         STATUS);
+        matcher.addURI(authority, LikeWorkContract.PATH_CAR,                    CAR);
+        matcher.addURI(authority, LikeWorkContract.PATH_CLIENT,                 CLIENT);
+        matcher.addURI(authority, LikeWorkContract.PATH_STATUS,                 STATUS);
 
         return matcher;
     }
@@ -68,6 +70,19 @@ public class LikeWorkProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
             case ORDER:
             {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        OrderEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+            case ORDER_WITH_GROUPS:
+            {
                 SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
                 qBuilder.setTables(OrderEntry.TABLE_NAME +
                                 " LEFT JOIN " + CarEntry.TABLE_NAME +
@@ -81,7 +96,7 @@ public class LikeWorkProvider extends ContentProvider {
                                 " = Customer." + ClientEntry.COLUMN_ID_1C +
                                 " LEFT JOIN " + StatusEntry.TABLE_NAME +
                                 " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_STATUS_ID +
-                                " = " + StatusEntry.TABLE_NAME + "." + StatusEntry._ID
+                                " = " + StatusEntry.TABLE_NAME + "." + StatusEntry.COLUMN_ID_1C
                 );
 
                 ArrayList<String> projectionListItems = new ArrayList<>();
@@ -128,6 +143,22 @@ public class LikeWorkProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder
+                );
+                break;
+            }
+            case RECORD_DATES: {
+
+                String groupBy = "date("+LikeWorkContract.RecordEntry.COLUMN_DATE+"/1000, \"unixepoch\")";
+                String[] newprojection = {groupBy + " " + LikeWorkContract.RecordEntry.COLUMN_DATE};
+
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        RecordEntry.TABLE_NAME,
+                        newprojection,
+                        selection,
+                        selectionArgs,
+                        groupBy,
+                        null,
+                        groupBy
                 );
                 break;
             }

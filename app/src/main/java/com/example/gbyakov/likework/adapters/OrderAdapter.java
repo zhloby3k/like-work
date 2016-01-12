@@ -13,8 +13,8 @@ import com.example.gbyakov.likework.data.LikeWorkContract;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class OrderAdapter extends CursorAdapter {
 
@@ -102,7 +102,7 @@ public class OrderAdapter extends CursorAdapter {
             unusualSymbols.setDecimalSeparator('.');
             unusualSymbols.setGroupingSeparator(' ');
 
-            DecimalFormat myFormatter = new DecimalFormat("###,###.00", unusualSymbols);
+            DecimalFormat myFormatter = new DecimalFormat("###,##0.00", unusualSymbols);
             myFormatter.setGroupingSize(3);
             viewHolder.sumView.setText(myFormatter.format(sum));
         }

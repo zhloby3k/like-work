@@ -59,7 +59,7 @@ public class OrdersListFragment extends Fragment implements LoaderManager.Loader
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(),
-                LikeWorkContract.OrderEntry.CONTENT_URI,
+                LikeWorkContract.OrderEntry.buildOrderWithGroups(),
                 ORDER_COLUMNS,
                 null,
                 null,

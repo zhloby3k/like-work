@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import com.example.gbyakov.likework.fragments.CallsListFragment;
 import com.example.gbyakov.likework.fragments.OrdersListFragment;
 import com.example.gbyakov.likework.fragments.RecordsTabFragment;
+import com.example.gbyakov.likework.sync.LikeWorkSyncAdapter;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_kpi) {
-
+            LikeWorkSyncAdapter.syncImmediately(this);
         } else if (id == R.id.nav_records) {
             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.container, new RecordsTabFragment()).commit();

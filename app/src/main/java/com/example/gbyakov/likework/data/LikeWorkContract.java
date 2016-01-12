@@ -49,6 +49,10 @@ public class LikeWorkContract {
         public static Uri buildOrderID(int id) {
             return CONTENT_URI.buildUpon().appendPath(Integer.toString(id)).build();
         }
+
+        public static Uri buildOrderWithGroups() {
+            return CONTENT_URI.buildUpon().appendPath("withgroups").build();
+        }
     }
 
     public static final class RecordEntry implements BaseColumns {
@@ -77,6 +81,10 @@ public class LikeWorkContract {
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
+        public static Uri buildOrderDates() {
+            return CONTENT_URI.buildUpon().appendPath("dates").build();
+        }
     }
 
     public static final class CallEntry implements BaseColumns {
@@ -103,6 +111,7 @@ public class LikeWorkContract {
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
     }
 
     public static final class CarEntry implements BaseColumns {
@@ -153,6 +162,7 @@ public class LikeWorkContract {
 
         public static final String TABLE_NAME           = "statuses";
 
+        public static final String COLUMN_ID_1C         = "_id_1c";
         public static final String COLUMN_NAME          = "status_name";
         public static final String COLUMN_COLOR         = "color";
         public static final String COLUMN_GROUP         = "group_name";

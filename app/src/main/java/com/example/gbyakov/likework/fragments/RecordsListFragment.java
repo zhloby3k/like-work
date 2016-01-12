@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +21,7 @@ public class RecordsListFragment extends Fragment implements LoaderManager.Loade
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;
 
+    private String mDate;
     private static final int RECORD_LOADER = 0;
 
     private static final String[] RECORD_COLUMNS = {
@@ -37,14 +37,15 @@ public class RecordsListFragment extends Fragment implements LoaderManager.Loade
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        Bundle bundle = getArguments();
+        mDate = bundle.getString("date");
+
         mRecordAdapter = new RecordAdapter(getActivity(), null, 0);
 
         View x = inflater.inflate(R.layout.fragment_records_list, container, false);
 
         mListView = (ListView) x.findViewById(R.id.records_listview);
         mListView.setAdapter(mRecordAdapter);
-
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Запись");
 
         return x;
     }
@@ -57,11 +58,15 @@ public class RecordsListFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        String selection = "date("+LikeWorkContract.RecordEntry.COLUMN_DATE+"/1000, \"unixepoch\")" + " = ?";
+        String[] selectionArgs = {mDate};
+
         return new CursorLoader(getActivity(),
                 LikeWorkContract.RecordEntry.CONTENT_URI,
                 RECORD_COLUMNS,
-                null,
-                null,
+                selection,
+                selectionArgs,
                 LikeWorkContract.RecordEntry.COLUMN_DATE);
     }
 

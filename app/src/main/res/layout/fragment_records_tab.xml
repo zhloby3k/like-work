@@ -11,7 +11,7 @@
     <android.support.design.widget.TabLayout
         android:id="@+id/tabs"
         app:tabGravity="fill"
-        app:tabMode="fixed"
+        app:tabMode="scrollable"
         android:background="@color/ColorTabs"
         app:tabSelectedTextColor="@color/colorPrimaryDark"
         app:tabIndicatorColor="@color/colorPrimaryDark"
