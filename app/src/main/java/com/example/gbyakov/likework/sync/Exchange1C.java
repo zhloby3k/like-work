@@ -3,6 +3,7 @@ package com.example.gbyakov.likework.sync;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 import com.example.gbyakov.likework.data.LikeWorkContract;
 
@@ -22,15 +23,16 @@ import org.w3c.dom.NodeList;
 import java.io.ByteArrayInputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 public class Exchange1C {
 
-    static public String LOG_TAG = LikeWorkSyncAdapter.class.getSimpleName();
+    static public String LOG_TAG = Exchange1C.class.getSimpleName();
 
     static private String mUserName;
     static private String mDomain;
@@ -85,6 +87,7 @@ public class Exchange1C {
 
         String response = SendRequest("GetOrders");
         if (!response.equals("")){
+            Log.d(LOG_TAG, "GetOrders - start");
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             try {
                 DocumentBuilder builder = factory.newDocumentBuilder();
@@ -97,6 +100,29 @@ public class Exchange1C {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+            Log.d(LOG_TAG, "GetOrders - finish");
+        }
+
+    }
+
+    public static void UpdateCalls() {
+
+        String response = SendRequest("GetFollowups");
+        if (!response.equals("")){
+            Log.d(LOG_TAG, "GetFollowUps - start");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            try {
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document dom = builder.parse(new ByteArrayInputStream(response.getBytes()));
+                Element root = dom.getDocumentElement();
+                NodeList items = root.getElementsByTagName("m:followup");
+                for (int i=0;i<items.getLength();i++){
+                    Call(items.item(i));
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            Log.d(LOG_TAG, "GetFollowUps - finish");
         }
 
     }
@@ -106,13 +132,13 @@ public class Exchange1C {
         ContentValues orderValues = new ContentValues();
         NodeList orderAttributes = orderNode.getChildNodes();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        ArrayList<String> orderID = new ArrayList<>();
+        String orderID = "";
 
         for (int i = 0; i < orderAttributes.getLength(); i++) {
             Node attr = orderAttributes.item(i);
             if (attr.getNodeName().equalsIgnoreCase("m:id")) {
                 orderValues.put(LikeWorkContract.OrderEntry.COLUMN_ID_1C, attr.getTextContent());
-                orderID.add(attr.getTextContent());
+                orderID = attr.getTextContent();
             }
             else if(attr.getNodeName().equalsIgnoreCase("m:number")) {
                 orderValues.put(LikeWorkContract.OrderEntry.COLUMN_NUMBER, attr.getTextContent());
@@ -120,9 +146,6 @@ public class Exchange1C {
             else if(attr.getNodeName().equalsIgnoreCase("m:date")) {
                 Date date = format.parse(attr.getTextContent());
                 orderValues.put(LikeWorkContract.OrderEntry.COLUMN_DATE, date.getTime());
-            }
-            else if(attr.getNodeName().equalsIgnoreCase("m:number")) {
-                orderValues.put(LikeWorkContract.OrderEntry.COLUMN_NUMBER, attr.getTextContent());
             }
             else if(attr.getNodeName().equalsIgnoreCase("m:sum")) {
                 orderValues.put(LikeWorkContract.OrderEntry.COLUMN_SUM, Double.parseDouble(attr.getTextContent()));
@@ -151,7 +174,7 @@ public class Exchange1C {
         }
 
         String selection = LikeWorkContract.OrderEntry.COLUMN_ID_1C + " = ?";
-        String[] selectionArgs = orderID.toArray(new String[orderID.size()]);
+        String[] selectionArgs = {orderID};
 
         Cursor cursor = mContext.getContentResolver().query(
                 LikeWorkContract.OrderEntry.CONTENT_URI,
@@ -162,9 +185,82 @@ public class Exchange1C {
                 null);
 
         if (cursor.moveToFirst()) {
-            mContext.getContentResolver().update(LikeWorkContract.OrderEntry.CONTENT_URI, orderValues, selection, selectionArgs);
+            if (dataChanged(cursor, orderValues)) {
+                mContext.getContentResolver().update(LikeWorkContract.OrderEntry.CONTENT_URI, orderValues, selection, selectionArgs);
+            }
         } else {
             mContext.getContentResolver().insert(LikeWorkContract.OrderEntry.CONTENT_URI, orderValues);
+        }
+
+    }
+
+    private static void Call(Node orderNode) throws ParseException {
+
+        ContentValues CallValues = new ContentValues();
+        NodeList CallAttributes = orderNode.getChildNodes();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String orderID = "";
+
+        for (int i = 0; i < CallAttributes.getLength(); i++) {
+            Node attr = CallAttributes.item(i);
+            if (attr.getNodeName().equalsIgnoreCase("m:id")) {
+                CallValues.put(LikeWorkContract.CallEntry.COLUMN_ID_1C, attr.getTextContent());
+                orderID = attr.getTextContent();
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:date")) {
+                Date date = format.parse(attr.getTextContent());
+                CallValues.put(LikeWorkContract.CallEntry.COLUMN_DATE, date.getTime());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:sum")) {
+                CallValues.put(LikeWorkContract.CallEntry.COLUMN_SUM, Double.parseDouble(attr.getTextContent()));
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:type")) {
+                CallValues.put(LikeWorkContract.CallEntry.COLUMN_TYPE, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:reason")) {
+                CallValues.put(LikeWorkContract.CallEntry.COLUMN_REASON, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:car")) {
+                CallValues.put(LikeWorkContract.CallEntry.COLUMN_CAR_ID, Car(attr));
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:client")) {
+                CallValues.put(LikeWorkContract.CallEntry.COLUMN_CLIENT_ID, Client(attr));
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:interview")) {
+                CallValues.put(LikeWorkContract.CallEntry.COLUMN_INTERVIEW_ID, attr.getTextContent());
+            }
+        }
+
+        String[] projection = {
+                LikeWorkContract.CallEntry.TABLE_NAME + "." + LikeWorkContract.CallEntry._ID,
+                LikeWorkContract.CallEntry.TABLE_NAME + "." + LikeWorkContract.CallEntry.COLUMN_ID_1C,
+                LikeWorkContract.CallEntry.COLUMN_DATE,
+                LikeWorkContract.CallEntry.COLUMN_CAR_ID,
+                LikeWorkContract.CallEntry.COLUMN_CLIENT_ID,
+                LikeWorkContract.CallEntry.COLUMN_TYPE,
+                LikeWorkContract.CallEntry.COLUMN_REASON,
+                LikeWorkContract.CallEntry.COLUMN_SUM,
+                LikeWorkContract.CallEntry.COLUMN_INTERVIEW_ID
+        };
+
+        String selection = LikeWorkContract.CallEntry.TABLE_NAME + "." +
+                            LikeWorkContract.CallEntry.COLUMN_ID_1C + " = ?";
+        String[] selectionArgs = {orderID};
+
+        Cursor cursor = mContext.getContentResolver().query(
+                LikeWorkContract.CallEntry.CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null);
+
+        if (cursor.moveToFirst()) {
+            if (dataChanged(cursor, CallValues)) {
+                mContext.getContentResolver().update(LikeWorkContract.CallEntry.CONTENT_URI, CallValues, selection, selectionArgs);
+            }
+        } else {
+            mContext.getContentResolver().insert(LikeWorkContract.CallEntry.CONTENT_URI, CallValues);
         }
 
     }
@@ -173,13 +269,13 @@ public class Exchange1C {
 
         ContentValues carValues = new ContentValues();
         NodeList carAttributes = carNode.getChildNodes();
-        ArrayList<String> carID = new ArrayList<>();
+        String carID = "";
 
         for (int i = 0; i < carAttributes.getLength(); i++) {
             Node attr = carAttributes.item(i);
             if (attr.getNodeName().equalsIgnoreCase("m:id")) {
                 carValues.put(LikeWorkContract.CarEntry.COLUMN_ID_1C, attr.getTextContent());
-                carID.add(attr.getTextContent());
+                carID = attr.getTextContent();
             }
             else if(attr.getNodeName().equalsIgnoreCase("m:brand")) {
                 carValues.put(LikeWorkContract.CarEntry.COLUMN_BRAND, attr.getTextContent());
@@ -193,7 +289,7 @@ public class Exchange1C {
         }
 
         String selection = LikeWorkContract.CarEntry.COLUMN_ID_1C + " = ?";
-        String[] selectionArgs = carID.toArray(new String[carID.size()]);
+        String[] selectionArgs = {carID};
 
         Cursor cursor = mContext.getContentResolver().query(
                 LikeWorkContract.CarEntry.CONTENT_URI,
@@ -204,25 +300,27 @@ public class Exchange1C {
                 null);
 
         if (cursor.moveToFirst()) {
-            mContext.getContentResolver().update(LikeWorkContract.CarEntry.CONTENT_URI, carValues, selection, selectionArgs);
+            if (dataChanged(cursor, carValues)) {
+                mContext.getContentResolver().update(LikeWorkContract.CarEntry.CONTENT_URI, carValues, selection, selectionArgs);
+            }
         } else {
             mContext.getContentResolver().insert(LikeWorkContract.CarEntry.CONTENT_URI, carValues);
         }
 
-        return carID.get(0);
+        return carID;
     }
 
     private static String Client(Node clientNode) {
 
         ContentValues clientValues = new ContentValues();
         NodeList carAttributes = clientNode.getChildNodes();
-        ArrayList<String> clientID = new ArrayList<>();
+        String clientID = "";
 
         for (int i = 0; i < carAttributes.getLength(); i++) {
             Node attr = carAttributes.item(i);
             if (attr.getNodeName().equalsIgnoreCase("m:id")) {
                 clientValues.put(LikeWorkContract.ClientEntry.COLUMN_ID_1C, attr.getTextContent());
-                clientID.add(attr.getTextContent());
+                clientID = attr.getTextContent();
             }
             else if(attr.getNodeName().equalsIgnoreCase("m:name")) {
                 clientValues.put(LikeWorkContract.ClientEntry.COLUMN_NAME, attr.getTextContent());
@@ -230,7 +328,7 @@ public class Exchange1C {
         }
 
         String selection = LikeWorkContract.ClientEntry.COLUMN_ID_1C + " = ?";
-        String[] selectionArgs = clientID.toArray(new String[clientID.size()]);
+        String[] selectionArgs = {clientID};
 
         Cursor cursor = mContext.getContentResolver().query(
                 LikeWorkContract.ClientEntry.CONTENT_URI,
@@ -241,12 +339,14 @@ public class Exchange1C {
                 null);
 
         if (cursor.moveToFirst()) {
-            mContext.getContentResolver().update(LikeWorkContract.ClientEntry.CONTENT_URI, clientValues, selection, selectionArgs);
+            if (dataChanged(cursor, clientValues)) {
+                mContext.getContentResolver().update(LikeWorkContract.ClientEntry.CONTENT_URI, clientValues, selection, selectionArgs);
+            }
         } else {
             mContext.getContentResolver().insert(LikeWorkContract.ClientEntry.CONTENT_URI, clientValues);
         }
 
-        return clientID.get(0);
+        return clientID;
 
     }
 
@@ -254,13 +354,13 @@ public class Exchange1C {
 
         ContentValues statusValues = new ContentValues();
         NodeList carAttributes = statusNode.getChildNodes();
-        ArrayList<String> statusID = new ArrayList<>();
+        String statusID = "";
 
         for (int i = 0; i < carAttributes.getLength(); i++) {
             Node attr = carAttributes.item(i);
             if (attr.getNodeName().equalsIgnoreCase("m:id")) {
                 statusValues.put(LikeWorkContract.StatusEntry.COLUMN_ID_1C, attr.getTextContent());
-                statusID.add(attr.getTextContent());
+                statusID = attr.getTextContent();
             }
             else if(attr.getNodeName().equalsIgnoreCase("m:name")) {
                 statusValues.put(LikeWorkContract.StatusEntry.COLUMN_NAME, attr.getTextContent());
@@ -274,7 +374,7 @@ public class Exchange1C {
         }
 
         String selection = LikeWorkContract.StatusEntry.COLUMN_ID_1C + " = ?";
-        String[] selectionArgs = statusID.toArray(new String[statusID.size()]);
+        String[] selectionArgs = {statusID};
 
         Cursor cursor = mContext.getContentResolver().query(
                 LikeWorkContract.StatusEntry.CONTENT_URI,
@@ -285,12 +385,25 @@ public class Exchange1C {
                 null);
 
         if (cursor.moveToFirst()) {
-            mContext.getContentResolver().update(LikeWorkContract.StatusEntry.CONTENT_URI, statusValues, selection, selectionArgs);
+            if (dataChanged(cursor, statusValues)) {
+                mContext.getContentResolver().update(LikeWorkContract.StatusEntry.CONTENT_URI, statusValues, selection, selectionArgs);
+            }
         } else {
             mContext.getContentResolver().insert(LikeWorkContract.StatusEntry.CONTENT_URI, statusValues);
         }
 
-        return statusID.get(0);
+        return statusID;
     }
 
+    private static boolean dataChanged(Cursor valueCursor, ContentValues expectedValues) {
+        Set<Map.Entry<String, Object>> valueSet = expectedValues.valueSet();
+        for (Map.Entry<String, Object> entry : valueSet) {
+            String columnName = entry.getKey();
+            int idx = valueCursor.getColumnIndex(columnName);
+            String expectedValue = entry.getValue().toString();
+            if (idx == -1) return true;
+            if (!expectedValue.equals(valueCursor.getString(idx))) return true;
+        }
+        return false;
+    }
 }
