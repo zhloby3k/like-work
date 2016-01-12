@@ -32,7 +32,7 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
                 OrderEntry.COLUMN_CAR_ID + " TEXT NOT NULL, " +
                 OrderEntry.COLUMN_CLIENT_ID + " TEXT NOT NULL, " +
                 OrderEntry.COLUMN_CUSTOMER_ID + " TEXT NOT NULL, " +
-                OrderEntry.COLUMN_STATUS_ID + " INTEGER NOT NULL, " +
+                OrderEntry.COLUMN_STATUS_ID + " TEXT NOT NULL, " +
                 OrderEntry.COLUMN_TYPE + " TEXT NOT NULL, " +
                 OrderEntry.COLUMN_REASON + " TEXT NOT NULL, " +
                 OrderEntry.COLUMN_COMMENT + " TEXT NOT NULL, " +

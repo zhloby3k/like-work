@@ -49,6 +49,10 @@ public class LikeWorkContract {
         public static Uri buildOrderID(int id) {
             return CONTENT_URI.buildUpon().appendPath(Integer.toString(id)).build();
         }
+
+        public static Uri buildOrderWithGroups() {
+            return CONTENT_URI.buildUpon().appendPath("withgroups").build();
+        }
     }
 
     public static final class RecordEntry implements BaseColumns {

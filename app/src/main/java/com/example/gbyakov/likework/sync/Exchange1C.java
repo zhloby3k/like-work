@@ -133,6 +133,9 @@ public class Exchange1C {
             else if(attr.getNodeName().equalsIgnoreCase("m:comment")) {
                 orderValues.put(LikeWorkContract.OrderEntry.COLUMN_COMMENT, attr.getTextContent());
             }
+            else if(attr.getNodeName().equalsIgnoreCase("m:reason")) {
+                orderValues.put(LikeWorkContract.OrderEntry.COLUMN_REASON, attr.getTextContent());
+            }
             else if(attr.getNodeName().equalsIgnoreCase("m:car")) {
                 orderValues.put(LikeWorkContract.OrderEntry.COLUMN_CAR_ID, Car(attr));
             }
