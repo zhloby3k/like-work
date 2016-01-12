@@ -127,6 +127,28 @@ public class Exchange1C {
 
     }
 
+    public static void UpdateRecords() {
+
+        String response = SendRequest("GetRecords");
+        if (!response.equals("")){
+            Log.d(LOG_TAG, "GetRecords - start");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            try {
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document dom = builder.parse(new ByteArrayInputStream(response.getBytes()));
+                Element root = dom.getDocumentElement();
+                NodeList items = root.getElementsByTagName("m:record");
+                for (int i=0;i<items.getLength();i++){
+                    Record(items.item(i));
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            Log.d(LOG_TAG, "GetRecords - finish");
+        }
+
+    }
+
     private static void Order(Node orderNode) throws ParseException {
 
         ContentValues orderValues = new ContentValues();
@@ -194,10 +216,88 @@ public class Exchange1C {
 
     }
 
-    private static void Call(Node orderNode) throws ParseException {
+    private static void Record(Node recordNode) throws ParseException {
+
+        ContentValues recordValues = new ContentValues();
+        NodeList recordAttributes = recordNode.getChildNodes();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        String orderID = "";
+
+        for (int i = 0; i < recordAttributes.getLength(); i++) {
+            Node attr = recordAttributes.item(i);
+            if (attr.getNodeName().equalsIgnoreCase("m:id")) {
+                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_ID_1C, attr.getTextContent());
+                orderID = attr.getTextContent();
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:number")) {
+                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_NUMBER, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:date")) {
+                Date date = format.parse(attr.getTextContent());
+                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_DATE, date.getTime());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:sum")) {
+                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_SUM, Double.parseDouble(attr.getTextContent()));
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:type")) {
+                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_TYPE, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:reason")) {
+                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_REASON, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:car")) {
+                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_CAR_ID, Car(attr));
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:customer")) {
+                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_CUSTOMER_ID, Client(attr));
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:client")) {
+                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_CLIENT_ID, Client(attr));
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:done")) {
+                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_DONE, (attr.getTextContent() == "true") ? 1 : 0);
+            }
+        }
+
+        String selection = LikeWorkContract.RecordEntry.TABLE_NAME + "." +
+                            LikeWorkContract.RecordEntry.COLUMN_ID_1C + " = ?";
+        String[] selectionArgs = {orderID};
+
+        String[] projection = {
+                LikeWorkContract.RecordEntry.TABLE_NAME + "." + LikeWorkContract.RecordEntry._ID,
+                LikeWorkContract.RecordEntry.TABLE_NAME + "." + LikeWorkContract.RecordEntry.COLUMN_ID_1C,
+                LikeWorkContract.RecordEntry.COLUMN_NUMBER,
+                LikeWorkContract.RecordEntry.COLUMN_DATE,
+                LikeWorkContract.RecordEntry.COLUMN_CAR_ID,
+                LikeWorkContract.RecordEntry.COLUMN_CLIENT_ID,
+                LikeWorkContract.RecordEntry.COLUMN_CUSTOMER_ID,
+                LikeWorkContract.RecordEntry.COLUMN_TYPE,
+                LikeWorkContract.RecordEntry.COLUMN_REASON,
+                LikeWorkContract.RecordEntry.COLUMN_SUM
+        };
+
+        Cursor cursor = mContext.getContentResolver().query(
+                LikeWorkContract.RecordEntry.CONTENT_URI,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null);
+
+        if (cursor.moveToFirst()) {
+            if (dataChanged(cursor, recordValues)) {
+                mContext.getContentResolver().update(LikeWorkContract.RecordEntry.CONTENT_URI, recordValues, selection, selectionArgs);
+            }
+        } else {
+            mContext.getContentResolver().insert(LikeWorkContract.RecordEntry.CONTENT_URI, recordValues);
+        }
+
+    }
+
+    private static void Call(Node callNode) throws ParseException {
 
         ContentValues CallValues = new ContentValues();
-        NodeList CallAttributes = orderNode.getChildNodes();
+        NodeList CallAttributes = callNode.getChildNodes();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String orderID = "";
 

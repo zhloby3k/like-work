@@ -39,6 +39,7 @@ public class LikeWorkSyncAdapter extends AbstractThreadedSyncAdapter {
         Exchange1C mExchange = new Exchange1C(username, domain, password, getContext());
         mExchange.UpdateOrders();
         mExchange.UpdateCalls();
+        mExchange.UpdateRecords();
 
         Log.d(LOG_TAG, "End sync");
 
