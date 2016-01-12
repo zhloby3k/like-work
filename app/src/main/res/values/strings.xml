@@ -11,4 +11,6 @@
     <string name="ws_link">http://sr00038.md.mash-dvor.ru/alfa_green/ws/mobile.1cws</string>
     <string name="sync_account_type">like@work</string>
     <string name="content_authority">com.example.gbyakov.likework</string>
+    <string name="today">Сегодня</string>
+    <string name="tomorrow">Завтра</string>
 </resources>

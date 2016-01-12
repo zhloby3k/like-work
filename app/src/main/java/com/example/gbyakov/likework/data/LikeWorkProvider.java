@@ -27,7 +27,7 @@ public class LikeWorkProvider extends ContentProvider {
     static final int ORDER_WITH_GROUPS  = 110;
     static final int RECORD             = 200;
     static final int RECORD_ID          = 201;
-    static final int RECORD_WITH_DATE   = 210;
+    static final int RECORD_DATES       = 210;
     static final int CALL               = 300;
     static final int CALL_ID            = 301;
 
@@ -44,7 +44,7 @@ public class LikeWorkProvider extends ContentProvider {
         matcher.addURI(authority, LikeWorkContract.PATH_ORDER + "/#",           ORDER_ID);
         matcher.addURI(authority, LikeWorkContract.PATH_ORDER + "/withgroups",  ORDER_WITH_GROUPS);
         matcher.addURI(authority, LikeWorkContract.PATH_RECORD,                 RECORD);
-        matcher.addURI(authority, LikeWorkContract.PATH_RECORD + "/*",          RECORD_WITH_DATE);
+        matcher.addURI(authority, LikeWorkContract.PATH_RECORD + "/dates",      RECORD_DATES);
         matcher.addURI(authority, LikeWorkContract.PATH_RECORD + "/#",          RECORD_ID);
         matcher.addURI(authority, LikeWorkContract.PATH_CALL,                   CALL);
         matcher.addURI(authority, LikeWorkContract.PATH_CALL + "/#",            CALL_ID);
@@ -143,6 +143,22 @@ public class LikeWorkProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder
+                );
+                break;
+            }
+            case RECORD_DATES: {
+
+                String groupBy = "date("+LikeWorkContract.RecordEntry.COLUMN_DATE+"/1000, \"unixepoch\")";
+                String[] newprojection = {groupBy + " " + LikeWorkContract.RecordEntry.COLUMN_DATE};
+
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        RecordEntry.TABLE_NAME,
+                        newprojection,
+                        selection,
+                        selectionArgs,
+                        groupBy,
+                        null,
+                        groupBy
                 );
                 break;
             }

@@ -81,6 +81,10 @@ public class LikeWorkContract {
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
+        public static Uri buildOrderDates() {
+            return CONTENT_URI.buildUpon().appendPath("dates").build();
+        }
     }
 
     public static final class CallEntry implements BaseColumns {
@@ -107,6 +111,7 @@ public class LikeWorkContract {
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
     }
 
     public static final class CarEntry implements BaseColumns {

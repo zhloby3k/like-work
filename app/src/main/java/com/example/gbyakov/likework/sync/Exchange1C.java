@@ -70,8 +70,7 @@ public class Exchange1C {
 
             Integer mStatusCode = response.getStatusLine().getStatusCode();
             if (mStatusCode == 200) {
-                String responseBody = EntityUtils.toString(response.getEntity());
-                return responseBody;
+                return EntityUtils.toString(response.getEntity());
             }
 
         }
@@ -206,7 +205,7 @@ public class Exchange1C {
                 null,
                 null);
 
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             if (dataChanged(cursor, orderValues)) {
                 mContext.getContentResolver().update(LikeWorkContract.OrderEntry.CONTENT_URI, orderValues, selection, selectionArgs);
             }
@@ -255,7 +254,7 @@ public class Exchange1C {
                 recordValues.put(LikeWorkContract.RecordEntry.COLUMN_CLIENT_ID, Client(attr));
             }
             else if(attr.getNodeName().equalsIgnoreCase("m:done")) {
-                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_DONE, (attr.getTextContent() == "true") ? 1 : 0);
+                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_DONE, (attr.getTextContent().equals("true")) ? 1 : 0);
             }
         }
 
@@ -284,7 +283,7 @@ public class Exchange1C {
                 null,
                 null);
 
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             if (dataChanged(cursor, recordValues)) {
                 mContext.getContentResolver().update(LikeWorkContract.RecordEntry.CONTENT_URI, recordValues, selection, selectionArgs);
             }
@@ -355,7 +354,7 @@ public class Exchange1C {
                 null,
                 null);
 
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             if (dataChanged(cursor, CallValues)) {
                 mContext.getContentResolver().update(LikeWorkContract.CallEntry.CONTENT_URI, CallValues, selection, selectionArgs);
             }
@@ -399,7 +398,7 @@ public class Exchange1C {
                 null,
                 null);
 
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             if (dataChanged(cursor, carValues)) {
                 mContext.getContentResolver().update(LikeWorkContract.CarEntry.CONTENT_URI, carValues, selection, selectionArgs);
             }
@@ -438,7 +437,7 @@ public class Exchange1C {
                 null,
                 null);
 
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             if (dataChanged(cursor, clientValues)) {
                 mContext.getContentResolver().update(LikeWorkContract.ClientEntry.CONTENT_URI, clientValues, selection, selectionArgs);
             }
@@ -484,7 +483,7 @@ public class Exchange1C {
                 null,
                 null);
 
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             if (dataChanged(cursor, statusValues)) {
                 mContext.getContentResolver().update(LikeWorkContract.StatusEntry.CONTENT_URI, statusValues, selection, selectionArgs);
             }
