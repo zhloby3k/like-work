@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
+import com.example.gbyakov.likework.R;
 import com.example.gbyakov.likework.data.LikeWorkContract;
 
 import org.apache.http.HttpResponse;
@@ -61,7 +62,7 @@ public class Exchange1C {
                     new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
                     new NTCredentials(mUserName, mPassword, "", mDomain));
 
-            HttpPost httpPost = new HttpPost("http://sr00038.md.mash-dvor.ru/alfa_green/ws/mobile.1cws");
+            HttpPost httpPost = new HttpPost(mContext.getString(R.string.ws_link));
 
             StringEntity sEntity = new StringEntity(request);
             sEntity.setContentType("text/xml");
