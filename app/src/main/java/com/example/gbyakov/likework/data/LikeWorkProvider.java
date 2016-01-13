@@ -81,6 +81,37 @@ public class LikeWorkProvider extends ContentProvider {
                 );
                 break;
             }
+            case ORDER_ID:
+            {
+                SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
+                qBuilder.setTables(OrderEntry.TABLE_NAME +
+                                " LEFT JOIN " + CarEntry.TABLE_NAME +
+                                " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_CAR_ID +
+                                " = " + CarEntry.TABLE_NAME + "." + CarEntry.COLUMN_ID_1C +
+                                " LEFT JOIN " + ClientEntry.TABLE_NAME + " AS Client" +
+                                " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_CLIENT_ID +
+                                " = Client." + ClientEntry.COLUMN_ID_1C +
+                                " LEFT JOIN " + ClientEntry.TABLE_NAME + " AS Customer" +
+                                " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_CUSTOMER_ID +
+                                " = Customer." + ClientEntry.COLUMN_ID_1C +
+                                " LEFT JOIN " + StatusEntry.TABLE_NAME +
+                                " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_STATUS_ID +
+                                " = " + StatusEntry.TABLE_NAME + "." + StatusEntry.COLUMN_ID_1C
+                );
+
+                selection = OrderEntry.TABLE_NAME + "." + OrderEntry._ID + " = ?";
+                selectionArgs = new String[] {OrderEntry.getIDFromUri(uri)};
+
+                retCursor = qBuilder.query(mOpenHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
             case ORDER_WITH_GROUPS:
             {
                 SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();

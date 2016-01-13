@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.example.gbyakov.likework.data.LikeWorkContract;
 import com.example.gbyakov.likework.fragments.CallsListFragment;
@@ -110,11 +109,14 @@ public class MainActivity extends AppCompatActivity
     public void OnItemSelected(Uri itemUri) {
         String uriType = this.getContentResolver().getType(itemUri);
         if (uriType == LikeWorkContract.OrderEntry.CONTENT_ITEM_TYPE) {
+            Bundle args = new Bundle();
+            args.putParcelable(OrderItemFragment.ORDER_URI, itemUri);
+
+            OrderItemFragment fOrderItem = new OrderItemFragment();
+            fOrderItem.setArguments(args);
+
             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.container, new OrderItemFragment()).addToBackStack(null).commit();
+            fragmentTransaction.replace(R.id.container, fOrderItem).addToBackStack(null).commit();
         }
-        Toast toast = Toast.makeText(getApplicationContext(),
-                uriType, Toast.LENGTH_SHORT);
-        toast.show();
     }
 }

@@ -53,6 +53,10 @@ public class LikeWorkContract {
         public static Uri buildOrderWithGroups() {
             return CONTENT_URI.buildUpon().appendPath("withgroups").build();
         }
+
+        public static String getIDFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
     }
 
     public static final class RecordEntry implements BaseColumns {

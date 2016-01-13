@@ -9,11 +9,11 @@
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:layout_width="wrap_content">
+        android:layout_width="fill_parent">
 
         <FrameLayout
-            android:layout_width="32dp"
-            android:layout_height="32dp">
+            android:layout_width="24dp"
+            android:layout_height="24dp">
 
             <ImageView
                 android:layout_width="match_parent"
@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_width="wrap_content">
+            android:layout_width="fill_parent">
 
             <TextView
                 android:id="@+id/order_customer"
@@ -43,7 +43,8 @@
                 android:text="Контрагент"
                 style="@style/TextAppearance.AppCompat.Caption"
                 android:ellipsize="end"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:textColor="@color/colorPrimary" />
 
             <TextView
                 android:id="@+id/order_client"
@@ -56,12 +57,14 @@
                 android:singleLine="true" />
 
             <TextView
+                android:id="@+id/order_client_caption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Владелец"
                 style="@style/TextAppearance.AppCompat.Caption"
                 android:ellipsize="end"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:textColor="@color/colorPrimary" />
 
         </LinearLayout>
 
@@ -76,8 +79,8 @@
         android:layout_width="fill_parent">
 
         <FrameLayout
-            android:layout_width="32dp"
-            android:layout_height="32dp">
+            android:layout_width="24dp"
+            android:layout_height="24dp">
 
             <ImageView
                 android:layout_width="match_parent"
@@ -107,7 +110,8 @@
                 android:text="Автомобиль"
                 style="@style/TextAppearance.AppCompat.Caption"
                 android:ellipsize="end"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:textColor="@color/colorPrimary" />
 
             <LinearLayout
                 android:layout_height="wrap_content"
@@ -136,7 +140,8 @@
                         android:text="Вид ремонта"
                         style="@style/TextAppearance.AppCompat.Caption"
                         android:ellipsize="end"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        android:textColor="@color/colorPrimary" />
 
                 </LinearLayout>
 
@@ -144,7 +149,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_weight="6">
+                    android:layout_weight="5">
 
                     <TextView
                         android:id="@+id/order_sum"
@@ -163,7 +168,8 @@
                         style="@style/TextAppearance.AppCompat.Caption"
                         android:ellipsize="end"
                         android:singleLine="true"
-                        android:gravity="right" />
+                        android:gravity="right"
+                        android:textColor="@color/colorPrimary" />
 
                 </LinearLayout>
 
@@ -182,8 +188,8 @@
         android:layout_width="fill_parent">
 
         <FrameLayout
-            android:layout_width="32dp"
-            android:layout_height="32dp">
+            android:layout_width="24dp"
+            android:layout_height="24dp">
 
             <ImageView
                 android:layout_width="match_parent"
@@ -214,7 +220,8 @@
                 android:text="Статус"
                 style="@style/TextAppearance.AppCompat.Caption"
                 android:ellipsize="end"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:textColor="@color/colorPrimary" />
 
         </LinearLayout>
 
@@ -222,7 +229,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_weight="6">
+            android:layout_weight="5">
 
             <TextView
                 android:id="@+id/order_date"
@@ -241,7 +248,8 @@
                 style="@style/TextAppearance.AppCompat.Caption"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:gravity="right" />
+                android:gravity="right"
+                android:textColor="@color/colorPrimary" />
 
         </LinearLayout>
 
@@ -256,10 +264,11 @@
         android:layout_width="fill_parent">
 
         <FrameLayout
-            android:layout_width="32dp"
-            android:layout_height="32dp">
+            android:layout_width="24dp"
+            android:layout_height="24dp">
 
             <ImageView
+                android:id="@+id/order_comment_logo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_comment" />
