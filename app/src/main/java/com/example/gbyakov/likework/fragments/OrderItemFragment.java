@@ -3,15 +3,19 @@ package com.example.gbyakov.likework.fragments;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.gbyakov.likework.R;
@@ -20,6 +24,7 @@ import com.example.gbyakov.likework.data.LikeWorkContract;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class OrderItemFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -49,10 +54,15 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
     private TextView mClientCaptionView;
     private TextView mCarView;
     private TextView mCommentView;
-    private ImageView mCommentLogoView;
+    private LinearLayout mCommentLinearLayout;
     private TextView mStatusView;
     private TextView mTypeView;
     private TextView mSumView;
+
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    public static int pagesCount = 3;
+    public static ArrayList<String> pages;
 
     private Uri mUri;
 
@@ -71,10 +81,22 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
         mClientCaptionView = (TextView) rootView.findViewById(R.id.order_client_caption);
         mCarView = (TextView) rootView.findViewById(R.id.order_car);
         mCommentView = (TextView) rootView.findViewById(R.id.order_comment);
-        mCommentLogoView = (ImageView) rootView.findViewById(R.id.order_comment_logo);
+        mCommentLinearLayout = (LinearLayout) rootView.findViewById(R.id.order_comment_layout);
         mStatusView = (TextView) rootView.findViewById(R.id.order_status);
         mTypeView = (TextView) rootView.findViewById(R.id.order_type);
         mSumView = (TextView) rootView.findViewById(R.id.order_sum);
+
+        tabLayout = (TabLayout) rootView.findViewById(R.id.order_tabs);
+        viewPager = (ViewPager) rootView.findViewById(R.id.order_viewpager);
+        viewPager.setAdapter(new OrderTabPagerAdapter(getChildFragmentManager()));
+
+        tabLayout.post(new Runnable() {
+            public void run() {
+                tabLayout.setupWithViewPager(viewPager);
+            }
+        });
+
+
         return rootView;
     }
 
@@ -144,8 +166,7 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
             mCommentView.setText(comment);
 
             if (comment.isEmpty()) {
-                mCommentView.setVisibility(View.GONE);
-                mCommentLogoView.setVisibility(View.GONE);
+                mCommentLinearLayout.setVisibility(View.GONE);
             }
 
             String number = data.getString(data.getColumnIndex(LikeWorkContract.OrderEntry.COLUMN_NUMBER));
@@ -159,5 +180,39 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    class OrderTabPagerAdapter extends FragmentPagerAdapter {
+
+        public OrderTabPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+
+            switch (position){
+                case 0 : return new Fragment();
+                case 1 : return new Fragment();
+                case 2 : return new Fragment();
+            }
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            return pagesCount;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+
+            switch (position){
+                case 0 : return "Статусы";
+                case 1 : return "Товары";
+                case 2 : return "Работы";
+            }
+            return null;
+        }
     }
 }
