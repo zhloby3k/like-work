@@ -12,62 +12,64 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.example.gbyakov.likework.R;
-import com.example.gbyakov.likework.adapters.StateAdapter;
+import com.example.gbyakov.likework.adapters.PartAdapter;
 import com.example.gbyakov.likework.data.LikeWorkContract;
 
-public class StatesListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class PartsListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private String mDocId;
-    private StateAdapter mStateAdapter;
+    private PartAdapter mPartAdapter;
     private ListView mListView;
 
     private int mPosition = ListView.INVALID_POSITION;
-    private static final int STATES_LOADER = 0;
+    private static final int PARTS_LOADER = 0;
 
-    private static final String[] STATE_COLUMNS = {
-            LikeWorkContract.StateEntry.TABLE_NAME + "." + LikeWorkContract.StateEntry._ID,
-            LikeWorkContract.StateEntry.COLUMN_DATE,
-            LikeWorkContract.StateEntry.COLUMN_USER,
-            LikeWorkContract.StatusEntry.COLUMN_NAME
+    private static final String[] PART_COLUMNS = {
+            LikeWorkContract.PartEntry.TABLE_NAME + "." + LikeWorkContract.PartEntry._ID,
+            LikeWorkContract.PartEntry.COLUMN_LINENUM,
+            LikeWorkContract.PartEntry.COLUMN_NAME,
+            LikeWorkContract.PartEntry.COLUMN_CODE_1C,
+            LikeWorkContract.PartEntry.COLUMN_CATNUM,
+            LikeWorkContract.PartEntry.COLUMN_AMOUNT,
+            LikeWorkContract.PartEntry.COLUMN_STATUS,
+            LikeWorkContract.PartEntry.COLUMN_SUM
     };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         Bundle arguments = getArguments();
         if (arguments != null) {
             mDocId = arguments.getString("id_1c");
         }
 
-        mStateAdapter = new StateAdapter(getActivity(), null, 0);
+        mPartAdapter = new PartAdapter(getActivity(), null, 0);
 
-        View x = inflater.inflate(R.layout.fragment_states_list, container, false);
+        View x = inflater.inflate(R.layout.fragment_parts_list, container, false);
 
-        mListView = (ListView) x.findViewById(R.id.states_listview);
-        mListView.setAdapter(mStateAdapter);
+        mListView = (ListView) x.findViewById(R.id.parts_listview);
+        mListView.setAdapter(mPartAdapter);
 
         return x;
     }
 
-    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        getLoaderManager().initLoader(STATES_LOADER, null, this);
+        getLoaderManager().initLoader(PARTS_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(),
-                LikeWorkContract.StateEntry.buildDocUri(mDocId),
-                STATE_COLUMNS,
+                LikeWorkContract.PartEntry.buildDocUri(mDocId),
+                PART_COLUMNS,
                 null,
                 null,
-                LikeWorkContract.StateEntry.COLUMN_DATE);
+                LikeWorkContract.PartEntry.COLUMN_LINENUM);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mStateAdapter.swapCursor(data);
+        mPartAdapter.swapCursor(data);
         if (mPosition != ListView.INVALID_POSITION) {
             mListView.smoothScrollToPosition(mPosition);
         }
@@ -75,7 +77,6 @@ public class StatesListFragment extends Fragment implements LoaderManager.Loader
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mStateAdapter.swapCursor(null);
+        mPartAdapter.swapCursor(null);
     }
-
 }

@@ -201,7 +201,13 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
                     fStatesList.setArguments(args);
                     return fStatesList;
                 }
-                case 1 : return new Fragment();
+                case 1 : {
+                    Bundle args = new Bundle();
+                    args.putString("id_1c", mDocId);
+                    PartsListFragment fPartsList = new PartsListFragment();
+                    fPartsList.setArguments(args);
+                    return fPartsList;
+                }
                 case 2 : return new Fragment();
             }
             return null;
