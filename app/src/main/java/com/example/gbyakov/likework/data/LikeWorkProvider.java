@@ -11,8 +11,11 @@ import android.net.Uri;
 import com.example.gbyakov.likework.data.LikeWorkContract.CallEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.CarEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.ClientEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.OperationEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.OrderEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.PartEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.RecordEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.StateEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.StatusEntry;
 
 import java.util.ArrayList;
@@ -31,6 +34,13 @@ public class LikeWorkProvider extends ContentProvider {
     static final int CALL               = 300;
     static final int CALL_ID            = 301;
 
+    static final int STATE              = 400;
+    static final int STATE_OF_DOC       = 401;
+    static final int PART               = 410;
+    static final int PART_OF_DOC        = 411;
+    static final int OPERATION          = 420;
+    static final int OPERATION_OF_DOC   = 421;
+
     static final int CAR                = 1;
     static final int CLIENT             = 2;
     static final int STATUS             = 3;
@@ -48,6 +58,13 @@ public class LikeWorkProvider extends ContentProvider {
         matcher.addURI(authority, LikeWorkContract.PATH_RECORD + "/#",          RECORD_ID);
         matcher.addURI(authority, LikeWorkContract.PATH_CALL,                   CALL);
         matcher.addURI(authority, LikeWorkContract.PATH_CALL + "/#",            CALL_ID);
+
+        matcher.addURI(authority, LikeWorkContract.PATH_STATE,                  STATE);
+        matcher.addURI(authority, LikeWorkContract.PATH_STATE + "/*",           STATE_OF_DOC);
+        matcher.addURI(authority, LikeWorkContract.PATH_PART,                   PART);
+        matcher.addURI(authority, LikeWorkContract.PATH_PART + "/*",            PART_OF_DOC);
+        matcher.addURI(authority, LikeWorkContract.PATH_OPERATION,              OPERATION);
+        matcher.addURI(authority, LikeWorkContract.PATH_OPERATION + "/*",       OPERATION_OF_DOC);
 
         matcher.addURI(authority, LikeWorkContract.PATH_CAR,                    CAR);
         matcher.addURI(authority, LikeWorkContract.PATH_CLIENT,                 CLIENT);
@@ -251,11 +268,92 @@ public class LikeWorkProvider extends ContentProvider {
                 );
                 break;
             }
+            case STATE: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        StateEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+            case STATE_OF_DOC: {
+                selection = StateEntry.TABLE_NAME + "." + StateEntry.COLUMN_DOC_ID_1C + " = ?";
+                selectionArgs = new String[] {StateEntry.getDocFromUri(uri)};
+
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        StateEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+            case PART: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        PartEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+            case PART_OF_DOC: {
+                selection = PartEntry.TABLE_NAME + "." + PartEntry.COLUMN_DOC_ID_1C + " = ?";
+                selectionArgs = new String[] {PartEntry.getDocFromUri(uri)};
+
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        PartEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+            case OPERATION: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        OperationEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+            case OPERATION_OF_DOC: {
+                selection = OperationEntry.TABLE_NAME + "." + OperationEntry.COLUMN_DOC_ID_1C + " = ?";
+                selectionArgs = new String[] {OperationEntry.getDocFromUri(uri)};
+
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        OperationEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
-        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+        if (getContext() != null) retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
     }
 
@@ -282,6 +380,12 @@ public class LikeWorkProvider extends ContentProvider {
             case CLIENT:
                 return ClientEntry.CONTENT_TYPE;
             case STATUS:
+                return StatusEntry.CONTENT_TYPE;
+            case STATE:
+                return StateEntry.CONTENT_TYPE;
+            case PART:
+                return ClientEntry.CONTENT_TYPE;
+            case OPERATION:
                 return StatusEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -345,10 +449,34 @@ public class LikeWorkProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
+            case STATE: {
+                long _id = db.insert(StateEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = StateEntry.buildUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            case PART: {
+                long _id = db.insert(PartEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = PartEntry.buildUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            case OPERATION: {
+                long _id = db.insert(OperationEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = OperationEntry.buildUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        getContext().getContentResolver().notifyChange(uri, null);
+        if (getContext() != null) getContext().getContentResolver().notifyChange(uri, null);
         return returnUri;
     }
 
@@ -379,12 +507,21 @@ public class LikeWorkProvider extends ContentProvider {
             case STATUS:
                 rowsDeleted = db.delete(StatusEntry.TABLE_NAME, selection, selectionArgs);
                 break;
+            case STATE:
+                rowsDeleted = db.delete(StateEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case PART:
+                rowsDeleted = db.delete(PartEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case OPERATION:
+                rowsDeleted = db.delete(OperationEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
         if (rowsDeleted != 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+            if (getContext() != null) getContext().getContentResolver().notifyChange(uri, null);
         }
         return rowsDeleted;
     }
@@ -421,11 +558,23 @@ public class LikeWorkProvider extends ContentProvider {
                 rowsUpdated = db.update(StatusEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
+            case STATE:
+                rowsUpdated = db.update(StateEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+            case PART:
+                rowsUpdated = db.update(PartEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+            case OPERATION:
+                rowsUpdated = db.update(OperationEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         if (rowsUpdated != 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+            if (getContext() != null) getContext().getContentResolver().notifyChange(uri, null);
         }
         return rowsUpdated;
 

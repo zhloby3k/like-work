@@ -83,7 +83,7 @@ public class Exchange1C {
         return "";
     }
 
-    public static void UpdateOrders() {
+    public void UpdateOrders() {
 
         String response = SendRequest("GetOrders");
         if (!response.equals("")){
@@ -105,7 +105,7 @@ public class Exchange1C {
 
     }
 
-    public static void UpdateCalls() {
+    public void UpdateCalls() {
 
         String response = SendRequest("GetFollowups");
         if (!response.equals("")){
@@ -127,7 +127,7 @@ public class Exchange1C {
 
     }
 
-    public static void UpdateRecords() {
+    public void UpdateRecords() {
 
         String response = SendRequest("GetRecords");
         if (!response.equals("")){
@@ -145,6 +145,78 @@ public class Exchange1C {
                 throw new RuntimeException(e);
             }
             Log.d(LOG_TAG, "GetRecords - finish");
+        }
+
+    }
+
+    public void UpdateStates() {
+
+        String response = SendRequest("GetStates");
+        if (!response.equals("")){
+            Log.d(LOG_TAG, "GetStates - start");
+            mContext.getContentResolver().delete(LikeWorkContract.StateEntry.CONTENT_URI, null, null);
+            Log.d(LOG_TAG, "GetStates - trancate table");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            try {
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document dom = builder.parse(new ByteArrayInputStream(response.getBytes()));
+                Element root = dom.getDocumentElement();
+                NodeList items = root.getElementsByTagName("m:state");
+                for (int i=0;i<items.getLength();i++){
+                    State(items.item(i));
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            Log.d(LOG_TAG, "GetStates - finish");
+        }
+
+    }
+
+    public void UpdateParts() {
+
+        String response = SendRequest("GetParts");
+        if (!response.equals("")){
+            Log.d(LOG_TAG, "GetParts - start");
+            mContext.getContentResolver().delete(LikeWorkContract.PartEntry.CONTENT_URI, null, null);
+            Log.d(LOG_TAG, "GetParts - trancate table");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            try {
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document dom = builder.parse(new ByteArrayInputStream(response.getBytes()));
+                Element root = dom.getDocumentElement();
+                NodeList items = root.getElementsByTagName("m:part");
+                for (int i=0;i<items.getLength();i++){
+                    Part(items.item(i));
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            Log.d(LOG_TAG, "GetParts - finish");
+        }
+
+    }
+
+    public void UpdateOperations() {
+
+        String response = SendRequest("GetOperations");
+        if (!response.equals("")){
+            Log.d(LOG_TAG, "GetOperations - start");
+            mContext.getContentResolver().delete(LikeWorkContract.OperationEntry.CONTENT_URI, null, null);
+            Log.d(LOG_TAG, "GetOperations - trancate table");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            try {
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document dom = builder.parse(new ByteArrayInputStream(response.getBytes()));
+                Element root = dom.getDocumentElement();
+                NodeList items = root.getElementsByTagName("m:operation");
+                for (int i=0;i<items.getLength();i++){
+                    Operation(items.item(i));
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            Log.d(LOG_TAG, "GetOperations - finish");
         }
 
     }
@@ -363,6 +435,102 @@ public class Exchange1C {
             mContext.getContentResolver().insert(LikeWorkContract.CallEntry.CONTENT_URI, CallValues);
         }
 
+    }
+
+    private static void State(Node node) throws ParseException {
+
+        ContentValues newValues = new ContentValues();
+        NodeList attrs = node.getChildNodes();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+        for (int i = 0; i < attrs.getLength(); i++) {
+            Node attr = attrs.item(i);
+            if (attr.getNodeName().equalsIgnoreCase("m:id_doc")) {
+                newValues.put(LikeWorkContract.StateEntry.COLUMN_DOC_ID_1C, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:user")) {
+                newValues.put(LikeWorkContract.StateEntry.COLUMN_USER, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:date")) {
+                Date date = format.parse(attr.getTextContent());
+                newValues.put(LikeWorkContract.StateEntry.COLUMN_DATE, date.getTime());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:status")) {
+                newValues.put(LikeWorkContract.StateEntry.COLUMN_STATUS, Status(attr));
+            }
+        }
+
+        mContext.getContentResolver().insert(LikeWorkContract.StateEntry.CONTENT_URI, newValues);
+
+    }
+
+    private static void Part(Node node) throws ParseException {
+
+        ContentValues newValues = new ContentValues();
+        NodeList attrs = node.getChildNodes();
+
+        for (int i = 0; i < attrs.getLength(); i++) {
+            Node attr = attrs.item(i);
+            if (attr.getNodeName().equalsIgnoreCase("m:id_doc")) {
+                newValues.put(LikeWorkContract.PartEntry.COLUMN_DOC_ID_1C, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:linenumber")) {
+                newValues.put(LikeWorkContract.PartEntry.COLUMN_LINENUM, Integer.parseInt(attr.getTextContent()));
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:code")) {
+                newValues.put(LikeWorkContract.PartEntry.COLUMN_CODE_1C, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:catnumber")) {
+                newValues.put(LikeWorkContract.PartEntry.COLUMN_CATNUM, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:name")) {
+                newValues.put(LikeWorkContract.PartEntry.COLUMN_NAME, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:amount")) {
+                newValues.put(LikeWorkContract.PartEntry.COLUMN_AMOUNT, Double.parseDouble(attr.getTextContent()));
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:sum")) {
+                newValues.put(LikeWorkContract.PartEntry.COLUMN_SUM, Double.parseDouble(attr.getTextContent()));
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:status")) {
+                newValues.put(LikeWorkContract.PartEntry.COLUMN_STATUS, Integer.parseInt(attr.getTextContent()));
+            }
+        }
+
+        mContext.getContentResolver().insert(LikeWorkContract.PartEntry.CONTENT_URI, newValues);
+    }
+
+    private static void Operation(Node node) throws ParseException {
+
+        ContentValues newValues = new ContentValues();
+        NodeList attrs = node.getChildNodes();
+
+        for (int i = 0; i < attrs.getLength(); i++) {
+            Node attr = attrs.item(i);
+            if (attr.getNodeName().equalsIgnoreCase("m:id_doc")) {
+                newValues.put(LikeWorkContract.OperationEntry.COLUMN_DOC_ID_1C, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:linenumber")) {
+                newValues.put(LikeWorkContract.OperationEntry.COLUMN_LINENUM, Integer.parseInt(attr.getTextContent()));
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:code")) {
+                newValues.put(LikeWorkContract.OperationEntry.COLUMN_CODE_1C, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:name")) {
+                newValues.put(LikeWorkContract.PartEntry.COLUMN_NAME, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:amount")) {
+                newValues.put(LikeWorkContract.OperationEntry.COLUMN_AMOUNT, Double.parseDouble(attr.getTextContent()));
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:sum")) {
+                newValues.put(LikeWorkContract.OperationEntry.COLUMN_SUM, Double.parseDouble(attr.getTextContent()));
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:status")) {
+                newValues.put(LikeWorkContract.OperationEntry.COLUMN_STATUS, attr.getTextContent());
+            }
+        }
+
+        mContext.getContentResolver().insert(LikeWorkContract.OperationEntry.CONTENT_URI, newValues);
     }
 
     private static String Car(Node carNode) {
