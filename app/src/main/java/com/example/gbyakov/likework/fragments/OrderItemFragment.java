@@ -24,7 +24,6 @@ import com.example.gbyakov.likework.data.LikeWorkContract;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 public class OrderItemFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -34,6 +33,7 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
 
     private static final String[] ORDER_COLUMNS = {
             LikeWorkContract.OrderEntry.TABLE_NAME + "." + LikeWorkContract.OrderEntry._ID,
+            LikeWorkContract.OrderEntry.TABLE_NAME + "." + LikeWorkContract.OrderEntry.COLUMN_ID_1C,
             LikeWorkContract.OrderEntry.COLUMN_NUMBER,
             LikeWorkContract.OrderEntry.COLUMN_DATE,
             LikeWorkContract.OrderEntry.COLUMN_COMMENT,
@@ -61,10 +61,11 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
+
     public static int pagesCount = 3;
-    public static ArrayList<String> pages;
 
     private Uri mUri;
+    private String mDocId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -88,14 +89,6 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
 
         tabLayout = (TabLayout) rootView.findViewById(R.id.order_tabs);
         viewPager = (ViewPager) rootView.findViewById(R.id.order_viewpager);
-        viewPager.setAdapter(new OrderTabPagerAdapter(getChildFragmentManager()));
-
-        tabLayout.post(new Runnable() {
-            public void run() {
-                tabLayout.setupWithViewPager(viewPager);
-            }
-        });
-
 
         return rootView;
     }
@@ -173,6 +166,15 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
             android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
             if (actionBar != null) actionBar.setTitle("Заказ-наряд "+number);
 
+            mDocId = data.getString(data.getColumnIndex(LikeWorkContract.OrderEntry.COLUMN_ID_1C));
+            viewPager.setAdapter(new OrderTabPagerAdapter(getChildFragmentManager()));
+
+            tabLayout.post(new Runnable() {
+                public void run() {
+                    tabLayout.setupWithViewPager(viewPager);
+                }
+            });
+
         }
 
     }
@@ -192,7 +194,13 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
         public Fragment getItem(int position) {
 
             switch (position){
-                case 0 : return new Fragment();
+                case 0 : {
+                    Bundle args = new Bundle();
+                    args.putString("id_1c", mDocId);
+                    StatesListFragment fStatesList = new StatesListFragment();
+                    fStatesList.setArguments(args);
+                    return fStatesList;
+                }
                 case 1 : return new Fragment();
                 case 2 : return new Fragment();
             }

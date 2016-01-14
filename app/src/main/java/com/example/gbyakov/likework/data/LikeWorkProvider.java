@@ -281,11 +281,18 @@ public class LikeWorkProvider extends ContentProvider {
                 break;
             }
             case STATE_OF_DOC: {
+
+                SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
+                qBuilder.setTables(StateEntry.TABLE_NAME +
+                        " LEFT JOIN " + StatusEntry.TABLE_NAME +
+                        " ON " + StateEntry.TABLE_NAME + "." + StateEntry.COLUMN_STATUS +
+                        " = " + StatusEntry.TABLE_NAME + "." + StatusEntry.COLUMN_ID_1C
+                );
+
                 selection = StateEntry.TABLE_NAME + "." + StateEntry.COLUMN_DOC_ID_1C + " = ?";
                 selectionArgs = new String[] {StateEntry.getDocFromUri(uri)};
 
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        StateEntry.TABLE_NAME,
+                retCursor = qBuilder.query(mOpenHelper.getReadableDatabase(),
                         projection,
                         selection,
                         selectionArgs,
