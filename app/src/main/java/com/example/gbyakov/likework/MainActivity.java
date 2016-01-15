@@ -84,16 +84,20 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
 
         int id = item.getItemId();
+        int bseCount = mFragmentManager.getBackStackEntryCount();
 
         if (id == R.id.nav_kpi) {
             LikeWorkSyncAdapter.syncImmediately(this);
         } else if (id == R.id.nav_records) {
+            if (bseCount>0) mFragmentManager.popBackStack();
             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.container, new RecordsTabFragment()).commit();
         } else if (id == R.id.nav_orders) {
+            if (bseCount>0) mFragmentManager.popBackStack();
             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.container, new OrdersListFragment()).commit();
         } else if (id == R.id.nav_calls) {
+            if (bseCount>0) mFragmentManager.popBackStack();
             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.container, new CallsListFragment()).commit();
         } else if (id == R.id.nav_settings) {
@@ -108,7 +112,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void OnItemSelected(Uri itemUri) {
         String uriType = this.getContentResolver().getType(itemUri);
-        if (uriType == LikeWorkContract.OrderEntry.CONTENT_ITEM_TYPE) {
+        if (uriType.equals(LikeWorkContract.OrderEntry.CONTENT_ITEM_TYPE)) {
             Bundle args = new Bundle();
             args.putParcelable(OrderItemFragment.ORDER_URI, itemUri);
 
@@ -116,7 +120,10 @@ public class MainActivity extends AppCompatActivity
             fOrderItem.setArguments(args);
 
             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.container, fOrderItem).addToBackStack(null).commit();
+            fragmentTransaction
+                    .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                    .replace(R.id.container, fOrderItem)
+                    .addToBackStack(null).commit();
         }
     }
 }
