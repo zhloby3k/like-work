@@ -35,6 +35,7 @@ public class OrdersListFragment extends Fragment implements LoaderManager.Loader
         LikeWorkContract.OrderEntry.COLUMN_SUM,
         LikeWorkContract.StatusEntry.COLUMN_NAME,
         LikeWorkContract.StatusEntry.COLUMN_GROUP,
+        LikeWorkContract.StatusEntry.COLUMN_COLOR,
         LikeWorkContract.CarEntry.COLUMN_MODEL,
         LikeWorkContract.CarEntry.COLUMN_REGNUMBER,
         "Client." + LikeWorkContract.ClientEntry.COLUMN_NAME + " " + LikeWorkContract.ClientEntry.COLUMN_NAME
