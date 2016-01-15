@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:layout_height="56dp"
+    android:layout_width="match_parent">
+
+    <FrameLayout
+        android:layout_width="24dp"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/list_item_operations_status"
+            android:layout_gravity="center"
+            android:text="ш"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:gravity="center"
+            style="@style/TextAppearance.AppCompat.Subhead"/>
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin">
+
+        <TextView
+            android:id="@+id/list_item_operations_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Наполнитель бампера MITSUBISHI"
+            style="@style/TextAppearance.AppCompat.Body2"
+            android:ellipsize="end"
+            android:singleLine="true" />
+
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_width="match_parent">
+
+            <TextView
+                android:id="@+id/list_item_operations_catnumber"
+                android:layout_width="0dp"
+                android:layout_weight="6"
+                android:layout_height="wrap_content"
+                android:text="42103500-4CR"
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:ellipsize="end"
+                android:singleLine="true" />
+
+            <TextView
+                android:id="@+id/list_item_operations_amount"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.36"
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:gravity="right" />
+
+            <TextView
+                android:id="@+id/list_item_operations_sum"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:text="136 323.43"
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:gravity="right" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

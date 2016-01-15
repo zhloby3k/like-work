@@ -197,18 +197,24 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
                 case 0 : {
                     Bundle args = new Bundle();
                     args.putString("id_1c", mDocId);
-                    StatesListFragment fStatesList = new StatesListFragment();
-                    fStatesList.setArguments(args);
-                    return fStatesList;
-                }
-                case 1 : {
-                    Bundle args = new Bundle();
-                    args.putString("id_1c", mDocId);
                     PartsListFragment fPartsList = new PartsListFragment();
                     fPartsList.setArguments(args);
                     return fPartsList;
                 }
-                case 2 : return new Fragment();
+                case 1 : {
+                    Bundle args = new Bundle();
+                    args.putString("id_1c", mDocId);
+                    OperatiosListFragment fOperationsList = new OperatiosListFragment();
+                    fOperationsList.setArguments(args);
+                    return fOperationsList;
+                }
+                case 2 : {
+                    Bundle args = new Bundle();
+                    args.putString("id_1c", mDocId);
+                    StatesListFragment fStatesList = new StatesListFragment();
+                    fStatesList.setArguments(args);
+                    return fStatesList;
+                }
             }
             return null;
         }
@@ -222,9 +228,9 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
         public CharSequence getPageTitle(int position) {
 
             switch (position){
-                case 0 : return "Статусы";
-                case 1 : return "Товары";
-                case 2 : return "Работы";
+                case 0 : return "Товары";
+                case 1 : return "Работы";
+                case 2 : return "Статусы";
             }
             return null;
         }
