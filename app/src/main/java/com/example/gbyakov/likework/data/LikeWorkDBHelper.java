@@ -7,13 +7,16 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.example.gbyakov.likework.data.LikeWorkContract.CallEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.CarEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.ClientEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.OperationEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.OrderEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.PartEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.RecordEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.StateEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.StatusEntry;
 
 public class LikeWorkDBHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 1;
 
     static final String DATABASE_NAME = "likework.db";
 
@@ -87,30 +90,61 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
                 StatusEntry.COLUMN_GROUP + " TEXT NOT NULL " +
                 " );";
 
+        final String SQL_CREATE_STATE_TABLE = "CREATE TABLE " + StateEntry.TABLE_NAME + " (" +
+                StateEntry._ID + " INTEGER PRIMARY KEY," +
+                StateEntry.COLUMN_DOC_ID_1C + " TEXT NOT NULL, " +
+                StateEntry.COLUMN_DATE + " INTEGER NOT NULL, " +
+                StateEntry.COLUMN_STATUS + " TEXT NOT NULL, " +
+                StateEntry.COLUMN_USER + " TEXT NOT NULL " +
+                " );";
+
+        final String SQL_CREATE_PART_TABLE = "CREATE TABLE " + PartEntry.TABLE_NAME + " (" +
+                PartEntry._ID + " INTEGER PRIMARY KEY," +
+                PartEntry.COLUMN_CODE_1C + " TEXT NOT NULL, " +
+                PartEntry.COLUMN_DOC_ID_1C + " TEXT NOT NULL, " +
+                PartEntry.COLUMN_LINENUM + " INTEGER NOT NULL, " +
+                PartEntry.COLUMN_CATNUM + " TEXT NOT NULL, " +
+                PartEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+                PartEntry.COLUMN_AMOUNT + " REAL NOT NULL, " +
+                PartEntry.COLUMN_SUM + " REAL NOT NULL, " +
+                PartEntry.COLUMN_STATUS + " INTEGER NOT NULL " +
+                " );";
+
+        final String SQL_CREATE_OPERATION_TABLE = "CREATE TABLE " + OperationEntry.TABLE_NAME + " (" +
+                OperationEntry._ID + " INTEGER PRIMARY KEY," +
+                OperationEntry.COLUMN_CODE_1C + " TEXT NOT NULL, " +
+                OperationEntry.COLUMN_DOC_ID_1C + " TEXT NOT NULL, " +
+                OperationEntry.COLUMN_LINENUM + " INTEGER NOT NULL, " +
+                OperationEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+                OperationEntry.COLUMN_AMOUNT + " REAL NOT NULL, " +
+                OperationEntry.COLUMN_SUM + " REAL NOT NULL, " +
+                OperationEntry.COLUMN_STATUS + " TEXT NOT NULL " +
+                " );";
+
         db.execSQL(SQL_CREATE_ORDER_TABLE);
         db.execSQL(SQL_CREATE_RECORD_TABLE);
         db.execSQL(SQL_CREATE_CALL_TABLE);
         db.execSQL(SQL_CREATE_CAR_TABLE);
         db.execSQL(SQL_CREATE_CLIENT_TABLE);
         db.execSQL(SQL_CREATE_STATUS_TABLE);
-
+        db.execSQL(SQL_CREATE_STATE_TABLE);
+        db.execSQL(SQL_CREATE_PART_TABLE);
+        db.execSQL(SQL_CREATE_OPERATION_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        if (oldVersion == 1) {
-            db.execSQL("ALTER TABLE " + RecordEntry.TABLE_NAME + " ADD COLUMN " + RecordEntry.COLUMN_DONE + " INTEGER ");
-        }
-        else {
-            db.execSQL("DROP TABLE IF EXISTS " + OrderEntry.TABLE_NAME);
-            db.execSQL("DROP TABLE IF EXISTS " + RecordEntry.TABLE_NAME);
-            db.execSQL("DROP TABLE IF EXISTS " + CallEntry.TABLE_NAME);
-            db.execSQL("DROP TABLE IF EXISTS " + CarEntry.TABLE_NAME);
-            db.execSQL("DROP TABLE IF EXISTS " + ClientEntry.TABLE_NAME);
-            db.execSQL("DROP TABLE IF EXISTS " + StatusEntry.TABLE_NAME);
-            onCreate(db);
-        }
+        db.execSQL("DROP TABLE IF EXISTS " + OrderEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + RecordEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + CallEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + CarEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ClientEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + StatusEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + StateEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + PartEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + OperationEntry.TABLE_NAME);
+        onCreate(db);
 
     }
 }

@@ -2,10 +2,15 @@ package com.example.gbyakov.likework.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.gbyakov.likework.R;
@@ -40,6 +45,7 @@ public class OrderAdapter extends CursorAdapter {
         public final TextView carView;
         public final TextView clientView;
         public final TextView statusView;
+        public final ImageView statusIconView;
         public final TextView sumView;
 
         public ViewHolderOrder(View view) {
@@ -48,6 +54,8 @@ public class OrderAdapter extends CursorAdapter {
             clientView  = (TextView) view.findViewById(R.id.list_item_order_client);
             statusView  = (TextView) view.findViewById(R.id.list_item_order_status);
             sumView     = (TextView) view.findViewById(R.id.list_item_order_sum);
+
+            statusIconView  = (ImageView) view.findViewById(R.id.list_item_order_status_icon);
         }
     }
 
@@ -81,6 +89,15 @@ public class OrderAdapter extends CursorAdapter {
         }
         else {
             ViewHolderOrder viewHolder = (ViewHolderOrder) view.getTag();
+            ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
+            drawable.setIntrinsicHeight(24);
+            drawable.setIntrinsicWidth(24);
+
+            String color = cursor.getString(cursor.getColumnIndex(LikeWorkContract.StatusEntry.COLUMN_COLOR));
+            if (color.isEmpty() || color.equals("-")) drawable.getPaint().setStyle(Paint.Style.STROKE);
+            else drawable.getPaint().setColor(Color.parseColor(color));
+
+            viewHolder.statusIconView.setImageDrawable(drawable);
 
             long dateInMS    = cursor.getLong(cursor.getColumnIndex(LikeWorkContract.OrderEntry.COLUMN_DATE));
             Date date        = new Date(dateInMS);

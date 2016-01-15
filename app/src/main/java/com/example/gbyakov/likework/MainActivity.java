@@ -1,5 +1,6 @@
 package com.example.gbyakov.likework;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
@@ -10,17 +11,22 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.example.gbyakov.likework.data.LikeWorkContract;
 import com.example.gbyakov.likework.fragments.CallsListFragment;
+import com.example.gbyakov.likework.fragments.OrderItemFragment;
 import com.example.gbyakov.likework.fragments.OrdersListFragment;
 import com.example.gbyakov.likework.fragments.RecordsTabFragment;
 import com.example.gbyakov.likework.sync.LikeWorkSyncAdapter;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener,
+        OrdersListFragment.OnItemSelectedListener {
 
     FragmentManager mFragmentManager;
     FragmentTransaction mFragmentTransaction;
+    ActionBarDrawerToggle mDrawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,11 +37,33 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                if (getSupportActionBar() != null) {
+                    int bseCount = getSupportFragmentManager().getBackStackEntryCount();
+                    if (bseCount>0) {
+                        mDrawerToggle.setDrawerIndicatorEnabled(false);
+                        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                        mDrawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                getSupportFragmentManager().popBackStack();
+                            }
+                        });
+                    } else {
+                        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                        mDrawerToggle.setDrawerIndicatorEnabled(true);
+                    }
+                }
+            }
+        });
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        mDrawerToggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        drawer.setDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.left_drawer);
         navigationView.setNavigationItemSelectedListener(this);
@@ -75,5 +103,20 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void OnItemSelected(Uri itemUri) {
+        String uriType = this.getContentResolver().getType(itemUri);
+        if (uriType == LikeWorkContract.OrderEntry.CONTENT_ITEM_TYPE) {
+            Bundle args = new Bundle();
+            args.putParcelable(OrderItemFragment.ORDER_URI, itemUri);
+
+            OrderItemFragment fOrderItem = new OrderItemFragment();
+            fOrderItem.setArguments(args);
+
+            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.container, fOrderItem).addToBackStack(null).commit();
+        }
     }
 }

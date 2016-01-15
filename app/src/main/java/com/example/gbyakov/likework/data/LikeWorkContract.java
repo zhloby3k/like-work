@@ -17,6 +17,9 @@ public class LikeWorkContract {
     public static final String PATH_CAR     = "car";
     public static final String PATH_CLIENT  = "client";
     public static final String PATH_STATUS  = "status";
+    public static final String PATH_STATE   = "state";
+    public static final String PATH_PART    = "part";
+    public static final String PATH_OPERATION  = "operation";
 
     public static final class OrderEntry implements BaseColumns {
 
@@ -52,6 +55,10 @@ public class LikeWorkContract {
 
         public static Uri buildOrderWithGroups() {
             return CONTENT_URI.buildUpon().appendPath("withgroups").build();
+        }
+
+        public static String getIDFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
         }
     }
 
@@ -169,6 +176,91 @@ public class LikeWorkContract {
 
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
+    public static final class StateEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_STATE).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_STATE;
+
+        public static final String TABLE_NAME           = "states";
+
+        public static final String COLUMN_DOC_ID_1C     = "doc_id";
+        public static final String COLUMN_DATE          = "date";
+        public static final String COLUMN_STATUS        = "status_id";
+        public static final String COLUMN_USER          = "user_name";
+
+        public static Uri buildUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+        public static Uri buildDocUri(String docId) {
+            return CONTENT_URI.buildUpon().appendPath(docId).build();
+        }
+        public static String getDocFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+    }
+
+    public static final class PartEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_PART).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PART;
+
+        public static final String TABLE_NAME           = "parts";
+
+        public static final String COLUMN_CODE_1C       = "code_1c";
+        public static final String COLUMN_DOC_ID_1C     = "doc_id";
+        public static final String COLUMN_LINENUM       = "linenumber";
+        public static final String COLUMN_CATNUM        = "catnumber";
+        public static final String COLUMN_NAME          = "name";
+        public static final String COLUMN_AMOUNT        = "amount";
+        public static final String COLUMN_SUM           = "sum";
+        public static final String COLUMN_STATUS        = "status";
+
+        public static Uri buildUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+        public static Uri buildDocUri(String docId) {
+            return CONTENT_URI.buildUpon().appendPath(docId).build();
+        }
+        public static String getDocFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+    }
+
+    public static final class OperationEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_OPERATION).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_OPERATION;
+
+        public static final String TABLE_NAME           = "operations";
+
+        public static final String COLUMN_CODE_1C       = "code_1c";
+        public static final String COLUMN_DOC_ID_1C     = "doc_id";
+        public static final String COLUMN_LINENUM       = "linenumber";
+        public static final String COLUMN_NAME          = "name";
+        public static final String COLUMN_AMOUNT        = "amount";
+        public static final String COLUMN_SUM           = "sum";
+        public static final String COLUMN_STATUS        = "status";
+
+        public static Uri buildUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+        public static Uri buildDocUri(String docId) {
+            return CONTENT_URI.buildUpon().appendPath(docId).build();
+        }
+        public static String getDocFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
         }
     }
 

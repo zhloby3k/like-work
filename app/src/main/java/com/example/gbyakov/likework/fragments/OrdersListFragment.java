@@ -1,6 +1,9 @@
 package com.example.gbyakov.likework.fragments;
 
+import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -10,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.gbyakov.likework.R;
@@ -21,6 +25,7 @@ public class OrdersListFragment extends Fragment implements LoaderManager.Loader
     private OrderAdapter mOrderAdapter;
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;
+    OnItemSelectedListener mListener;
 
     private static final int ORDER_LOADER = 0;
 
@@ -30,10 +35,15 @@ public class OrdersListFragment extends Fragment implements LoaderManager.Loader
         LikeWorkContract.OrderEntry.COLUMN_SUM,
         LikeWorkContract.StatusEntry.COLUMN_NAME,
         LikeWorkContract.StatusEntry.COLUMN_GROUP,
+        LikeWorkContract.StatusEntry.COLUMN_COLOR,
         LikeWorkContract.CarEntry.COLUMN_MODEL,
         LikeWorkContract.CarEntry.COLUMN_REGNUMBER,
         "Client." + LikeWorkContract.ClientEntry.COLUMN_NAME + " " + LikeWorkContract.ClientEntry.COLUMN_NAME
     };
+
+    public interface OnItemSelectedListener {
+        void OnItemSelected(Uri itemUri);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,8 +54,21 @@ public class OrdersListFragment extends Fragment implements LoaderManager.Loader
 
         mListView = (ListView) x.findViewById(R.id.orders_listview);
         mListView.setAdapter(mOrderAdapter);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                if (cursor != null) {
+                    Integer id = cursor.getInt(cursor.getColumnIndex(LikeWorkContract.OrderEntry._ID));
+                    Uri itemUri = LikeWorkContract.OrderEntry.buildOrderID(id);
+                    mListener.OnItemSelected(itemUri);
+                }
+                mPosition = position;
+            }
+        });
 
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Реестр заказ-нарядов");
+        android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if (actionBar != null) actionBar.setTitle("Реестр заказ-нарядов");
 
         return x;
     }
@@ -54,6 +77,20 @@ public class OrdersListFragment extends Fragment implements LoaderManager.Loader
     public void onActivityCreated(Bundle savedInstanceState) {
         getLoaderManager().initLoader(ORDER_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+
+        super.onAttach(context);
+        if (context instanceof Activity){
+            try {
+                mListener = (OnItemSelectedListener) context;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(context.toString() + " must implement OnItemSelectedListener");
+            }
+        }
+
     }
 
     @Override
