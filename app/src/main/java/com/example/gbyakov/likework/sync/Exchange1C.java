@@ -24,7 +24,9 @@ import org.w3c.dom.NodeList;
 import java.io.ByteArrayInputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -85,18 +87,28 @@ public class Exchange1C {
 
     public void UpdateOrders() {
 
+        List<String> ids = new ArrayList<>();
+
         String response = SendRequest("GetOrders");
         if (!response.equals("")){
             Log.d(LOG_TAG, "GetOrders - start");
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             try {
+
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 Document dom = builder.parse(new ByteArrayInputStream(response.getBytes()));
                 Element root = dom.getDocumentElement();
                 NodeList items = root.getElementsByTagName("m:order");
                 for (int i=0;i<items.getLength();i++){
-                    Order(items.item(i));
+                    ids.add("'"+Order(items.item(i))+"'");
                 }
+
+                // delete orders not from list
+                String selection = LikeWorkContract.OrderEntry.COLUMN_ID_1C + " NOT IN ("+
+                        android.text.TextUtils.join(",", ids)+")";
+
+                mContext.getContentResolver().delete(LikeWorkContract.OrderEntry.CONTENT_URI, selection, null);
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -107,18 +119,29 @@ public class Exchange1C {
 
     public void UpdateCalls() {
 
+        List<String> ids = new ArrayList<>();
+
         String response = SendRequest("GetFollowups");
         if (!response.equals("")){
             Log.d(LOG_TAG, "GetFollowUps - start");
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             try {
+
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 Document dom = builder.parse(new ByteArrayInputStream(response.getBytes()));
                 Element root = dom.getDocumentElement();
                 NodeList items = root.getElementsByTagName("m:followup");
                 for (int i=0;i<items.getLength();i++){
-                    Call(items.item(i));
+                    ids.add("'"+Call(items.item(i))+"'");
                 }
+
+                // delete calls not from list
+                String selection = LikeWorkContract.CallEntry.TABLE_NAME + "." +
+                        LikeWorkContract.CallEntry.COLUMN_ID_1C + " NOT IN (" +
+                        android.text.TextUtils.join(",", ids)+")";
+
+                mContext.getContentResolver().delete(LikeWorkContract.CallEntry.CONTENT_URI, selection, null);
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -129,18 +152,29 @@ public class Exchange1C {
 
     public void UpdateRecords() {
 
+        List<String> ids = new ArrayList<>();
+
         String response = SendRequest("GetRecords");
         if (!response.equals("")){
             Log.d(LOG_TAG, "GetRecords - start");
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             try {
+
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 Document dom = builder.parse(new ByteArrayInputStream(response.getBytes()));
                 Element root = dom.getDocumentElement();
                 NodeList items = root.getElementsByTagName("m:record");
                 for (int i=0;i<items.getLength();i++){
-                    Record(items.item(i));
+                    ids.add("'" + Record(items.item(i)) + "'");
                 }
+
+                // delete records not from list
+                String selection = LikeWorkContract.RecordEntry.TABLE_NAME + "." +
+                        LikeWorkContract.RecordEntry.COLUMN_ID_1C + " NOT IN (" +
+                        android.text.TextUtils.join(",", ids)+")";
+
+                mContext.getContentResolver().delete(LikeWorkContract.RecordEntry.CONTENT_URI, selection, null);
+
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -221,7 +255,7 @@ public class Exchange1C {
 
     }
 
-    private static void Order(Node orderNode) throws ParseException {
+    private static String Order(Node orderNode) throws ParseException {
 
         ContentValues orderValues = new ContentValues();
         NodeList orderAttributes = orderNode.getChildNodes();
@@ -286,20 +320,21 @@ public class Exchange1C {
             mContext.getContentResolver().insert(LikeWorkContract.OrderEntry.CONTENT_URI, orderValues);
         }
 
+        return orderID;
     }
 
-    private static void Record(Node recordNode) throws ParseException {
+    private static String Record(Node recordNode) throws ParseException {
 
         ContentValues recordValues = new ContentValues();
         NodeList recordAttributes = recordNode.getChildNodes();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        String orderID = "";
+        String recordID = "";
 
         for (int i = 0; i < recordAttributes.getLength(); i++) {
             Node attr = recordAttributes.item(i);
             if (attr.getNodeName().equalsIgnoreCase("m:id")) {
                 recordValues.put(LikeWorkContract.RecordEntry.COLUMN_ID_1C, attr.getTextContent());
-                orderID = attr.getTextContent();
+                recordID = attr.getTextContent();
             }
             else if(attr.getNodeName().equalsIgnoreCase("m:number")) {
                 recordValues.put(LikeWorkContract.RecordEntry.COLUMN_NUMBER, attr.getTextContent());
@@ -333,7 +368,7 @@ public class Exchange1C {
 
         String selection = LikeWorkContract.RecordEntry.TABLE_NAME + "." +
                             LikeWorkContract.RecordEntry.COLUMN_ID_1C + " = ?";
-        String[] selectionArgs = {orderID};
+        String[] selectionArgs = {recordID};
 
         String[] projection = {
                 LikeWorkContract.RecordEntry.TABLE_NAME + "." + LikeWorkContract.RecordEntry._ID,
@@ -364,20 +399,22 @@ public class Exchange1C {
             mContext.getContentResolver().insert(LikeWorkContract.RecordEntry.CONTENT_URI, recordValues);
         }
 
+        return recordID;
+
     }
 
-    private static void Call(Node callNode) throws ParseException {
+    private static String Call(Node callNode) throws ParseException {
 
         ContentValues CallValues = new ContentValues();
         NodeList CallAttributes = callNode.getChildNodes();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        String orderID = "";
+        String callID = "";
 
         for (int i = 0; i < CallAttributes.getLength(); i++) {
             Node attr = CallAttributes.item(i);
             if (attr.getNodeName().equalsIgnoreCase("m:id")) {
                 CallValues.put(LikeWorkContract.CallEntry.COLUMN_ID_1C, attr.getTextContent());
-                orderID = attr.getTextContent();
+                callID = attr.getTextContent();
             }
             else if(attr.getNodeName().equalsIgnoreCase("m:date")) {
                 Date date = format.parse(attr.getTextContent());
@@ -417,7 +454,7 @@ public class Exchange1C {
 
         String selection = LikeWorkContract.CallEntry.TABLE_NAME + "." +
                             LikeWorkContract.CallEntry.COLUMN_ID_1C + " = ?";
-        String[] selectionArgs = {orderID};
+        String[] selectionArgs = {callID};
 
         Cursor cursor = mContext.getContentResolver().query(
                 LikeWorkContract.CallEntry.CONTENT_URI,
@@ -435,6 +472,7 @@ public class Exchange1C {
             mContext.getContentResolver().insert(LikeWorkContract.CallEntry.CONTENT_URI, CallValues);
         }
 
+        return callID;
     }
 
     private static void State(Node node) throws ParseException {
