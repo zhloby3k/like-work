@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.gbyakov.likework.data.LikeWorkContract;
+import com.example.gbyakov.likework.fragments.CallItemFragment;
 import com.example.gbyakov.likework.fragments.CallsListFragment;
 import com.example.gbyakov.likework.fragments.OrderItemFragment;
 import com.example.gbyakov.likework.fragments.OrdersListFragment;
@@ -25,7 +26,8 @@ import com.example.gbyakov.likework.sync.LikeWorkSyncAdapter;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         OrdersListFragment.OnItemSelectedListener,
-        RecordsListFragment.OnItemSelectedListener{
+        RecordsListFragment.OnItemSelectedListener,
+        CallsListFragment.OnItemSelectedListener{
 
     FragmentManager mFragmentManager;
     FragmentTransaction mFragmentTransaction;
@@ -138,6 +140,18 @@ public class MainActivity extends AppCompatActivity
             fragmentTransaction
                     .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                     .replace(R.id.container, fRecordItem)
+                    .addToBackStack(null).commit();
+        } else if (uriType.equals(LikeWorkContract.CallEntry.CONTENT_ITEM_TYPE)) {
+            Bundle args = new Bundle();
+            args.putParcelable(CallItemFragment.CALL_URI, itemUri);
+
+            CallItemFragment fCallItem = new CallItemFragment();
+            fCallItem.setArguments(args);
+
+            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+            fragmentTransaction
+                    .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                    .replace(R.id.container, fCallItem)
                     .addToBackStack(null).commit();
         }
     }

@@ -260,6 +260,31 @@ public class LikeWorkProvider extends ContentProvider {
                 );
                 break;
             }
+            case CALL_ID:
+            {
+                SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
+                qBuilder.setTables(CallEntry.TABLE_NAME +
+                                " LEFT JOIN " + CarEntry.TABLE_NAME +
+                                " ON " + CallEntry.TABLE_NAME + "." + CallEntry.COLUMN_CAR_ID +
+                                " = " + CarEntry.TABLE_NAME + "." + CarEntry.COLUMN_ID_1C +
+                                " LEFT JOIN " + ClientEntry.TABLE_NAME + " AS Client" +
+                                " ON " + CallEntry.TABLE_NAME + "." + CallEntry.COLUMN_CLIENT_ID +
+                                " = Client." + ClientEntry.COLUMN_ID_1C
+                );
+
+                selection = CallEntry.TABLE_NAME + "." + CallEntry._ID + " = ?";
+                selectionArgs = new String[] {CallEntry.getIDFromUri(uri)};
+
+                retCursor = qBuilder.query(mOpenHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
             case CAR: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         CarEntry.TABLE_NAME,

@@ -128,6 +128,13 @@ public class LikeWorkContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+        public static Uri buildCallID(int id) {
+            return CONTENT_URI.buildUpon().appendPath(Integer.toString(id)).build();
+        }
+
+        public static String getIDFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
     }
 
     public static final class CarEntry implements BaseColumns {
