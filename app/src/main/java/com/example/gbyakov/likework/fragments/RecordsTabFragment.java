@@ -163,7 +163,7 @@ public class RecordsTabFragment extends Fragment {
         @Override
         public CharSequence getPageTitle(int position) {
 
-            if (!pages.isEmpty() && pages.size() >= position)
+            if (!pages.isEmpty() && pages.size() >= position && getContext() != null)
                 return getFriendlyDayString(getContext(), pages.get(position));
             else
                 switch (position){

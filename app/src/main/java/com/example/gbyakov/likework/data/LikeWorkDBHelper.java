@@ -51,6 +51,7 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
                 RecordEntry.COLUMN_CLIENT_ID + " TEXT NOT NULL, " +
                 RecordEntry.COLUMN_CUSTOMER_ID + " TEXT NOT NULL, " +
                 RecordEntry.COLUMN_TYPE + " TEXT NOT NULL, " +
+                RecordEntry.COLUMN_COMMENT + " TEXT NOT NULL, " +
                 RecordEntry.COLUMN_REASON + " TEXT NOT NULL, " +
                 RecordEntry.COLUMN_SUM + " REAL NOT NULL, " +
                 RecordEntry.COLUMN_DONE + " INTEGER NOT NULL " +

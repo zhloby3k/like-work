@@ -1,6 +1,9 @@
 package com.example.gbyakov.likework.fragments;
 
+import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -9,6 +12,7 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.gbyakov.likework.R;
@@ -20,6 +24,7 @@ public class RecordsListFragment extends Fragment implements LoaderManager.Loade
     private RecordAdapter mRecordAdapter;
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;
+    OnItemSelectedListener mListener;
 
     private String mDate;
     private static final int RECORD_LOADER = 0;
@@ -34,6 +39,10 @@ public class RecordsListFragment extends Fragment implements LoaderManager.Loade
             "Client." + LikeWorkContract.ClientEntry.COLUMN_NAME + " " + LikeWorkContract.ClientEntry.COLUMN_NAME
     };
 
+    public interface OnItemSelectedListener {
+        void OnItemSelected(Uri itemUri);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -46,6 +55,18 @@ public class RecordsListFragment extends Fragment implements LoaderManager.Loade
 
         mListView = (ListView) x.findViewById(R.id.records_listview);
         mListView.setAdapter(mRecordAdapter);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                if (cursor != null) {
+                    Integer id = cursor.getInt(cursor.getColumnIndex(LikeWorkContract.RecordEntry._ID));
+                    Uri itemUri = LikeWorkContract.RecordEntry.buildRecordID(id);
+                    mListener.OnItemSelected(itemUri);
+                }
+                mPosition = position;
+            }
+        });
 
         return x;
     }
@@ -54,6 +75,20 @@ public class RecordsListFragment extends Fragment implements LoaderManager.Loade
     public void onActivityCreated(Bundle savedInstanceState) {
         getLoaderManager().initLoader(RECORD_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+
+        super.onAttach(context);
+        if (context instanceof Activity){
+            try {
+                mListener = (OnItemSelectedListener) context;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(context.toString() + " must implement OnItemSelectedListener");
+            }
+        }
+
     }
 
     @Override
