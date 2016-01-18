@@ -81,6 +81,7 @@ public class LikeWorkContract {
         public static final String COLUMN_CUSTOMER_ID   = "customer_id";
         public static final String COLUMN_CLIENT_ID     = "client_id";
         public static final String COLUMN_TYPE          = "type";
+        public static final String COLUMN_COMMENT       = "comment";
         public static final String COLUMN_REASON        = "reason";
         public static final String COLUMN_SUM           = "sum";
         public static final String COLUMN_DONE          = "done";
@@ -89,8 +90,16 @@ public class LikeWorkContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+        public static Uri buildRecordID(int id) {
+            return CONTENT_URI.buildUpon().appendPath(Integer.toString(id)).build();
+        }
+
         public static Uri buildOrderDates() {
             return CONTENT_URI.buildUpon().appendPath("dates").build();
+        }
+
+        public static String getIDFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
         }
     }
 

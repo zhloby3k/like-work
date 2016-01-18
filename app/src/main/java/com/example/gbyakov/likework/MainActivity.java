@@ -17,12 +17,15 @@ import com.example.gbyakov.likework.data.LikeWorkContract;
 import com.example.gbyakov.likework.fragments.CallsListFragment;
 import com.example.gbyakov.likework.fragments.OrderItemFragment;
 import com.example.gbyakov.likework.fragments.OrdersListFragment;
+import com.example.gbyakov.likework.fragments.RecordItemFragment;
+import com.example.gbyakov.likework.fragments.RecordsListFragment;
 import com.example.gbyakov.likework.fragments.RecordsTabFragment;
 import com.example.gbyakov.likework.sync.LikeWorkSyncAdapter;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        OrdersListFragment.OnItemSelectedListener {
+        OrdersListFragment.OnItemSelectedListener,
+        RecordsListFragment.OnItemSelectedListener{
 
     FragmentManager mFragmentManager;
     FragmentTransaction mFragmentTransaction;
@@ -123,6 +126,18 @@ public class MainActivity extends AppCompatActivity
             fragmentTransaction
                     .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                     .replace(R.id.container, fOrderItem)
+                    .addToBackStack(null).commit();
+        } else if (uriType.equals(LikeWorkContract.RecordEntry.CONTENT_ITEM_TYPE)) {
+            Bundle args = new Bundle();
+            args.putParcelable(RecordItemFragment.RECORD_URI, itemUri);
+
+            RecordItemFragment fRecordItem = new RecordItemFragment();
+            fRecordItem.setArguments(args);
+
+            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+            fragmentTransaction
+                    .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                    .replace(R.id.container, fRecordItem)
                     .addToBackStack(null).commit();
         }
     }

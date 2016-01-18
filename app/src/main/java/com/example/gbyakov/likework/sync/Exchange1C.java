@@ -349,6 +349,9 @@ public class Exchange1C {
             else if(attr.getNodeName().equalsIgnoreCase("m:type")) {
                 recordValues.put(LikeWorkContract.RecordEntry.COLUMN_TYPE, attr.getTextContent());
             }
+            else if(attr.getNodeName().equalsIgnoreCase("m:comment")) {
+                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_COMMENT, attr.getTextContent());
+            }
             else if(attr.getNodeName().equalsIgnoreCase("m:reason")) {
                 recordValues.put(LikeWorkContract.RecordEntry.COLUMN_REASON, attr.getTextContent());
             }
@@ -379,6 +382,7 @@ public class Exchange1C {
                 LikeWorkContract.RecordEntry.COLUMN_CLIENT_ID,
                 LikeWorkContract.RecordEntry.COLUMN_CUSTOMER_ID,
                 LikeWorkContract.RecordEntry.COLUMN_TYPE,
+                LikeWorkContract.RecordEntry.COLUMN_COMMENT,
                 LikeWorkContract.RecordEntry.COLUMN_REASON,
                 LikeWorkContract.RecordEntry.COLUMN_SUM
         };

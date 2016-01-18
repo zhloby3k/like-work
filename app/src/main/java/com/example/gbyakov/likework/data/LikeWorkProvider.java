@@ -194,6 +194,34 @@ public class LikeWorkProvider extends ContentProvider {
                 );
                 break;
             }
+            case RECORD_ID:
+            {
+                SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
+                qBuilder.setTables(RecordEntry.TABLE_NAME +
+                                " LEFT JOIN " + CarEntry.TABLE_NAME +
+                                " ON " + RecordEntry.TABLE_NAME + "." + RecordEntry.COLUMN_CAR_ID +
+                                " = " + CarEntry.TABLE_NAME + "." + CarEntry.COLUMN_ID_1C +
+                                " LEFT JOIN " + ClientEntry.TABLE_NAME + " AS Client" +
+                                " ON " + RecordEntry.TABLE_NAME + "." + RecordEntry.COLUMN_CLIENT_ID +
+                                " = Client." + ClientEntry.COLUMN_ID_1C +
+                                " LEFT JOIN " + ClientEntry.TABLE_NAME + " AS Customer" +
+                                " ON " + RecordEntry.TABLE_NAME + "." + RecordEntry.COLUMN_CUSTOMER_ID +
+                                " = Customer." + ClientEntry.COLUMN_ID_1C
+                );
+
+                selection = RecordEntry.TABLE_NAME + "." + RecordEntry._ID + " = ?";
+                selectionArgs = new String[] {RecordEntry.getIDFromUri(uri)};
+
+                retCursor = qBuilder.query(mOpenHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
             case RECORD_DATES: {
 
                 String groupBy = "date("+LikeWorkContract.RecordEntry.COLUMN_DATE+"/1000, \"unixepoch\")";
