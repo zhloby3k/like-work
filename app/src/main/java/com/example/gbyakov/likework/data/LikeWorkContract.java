@@ -318,7 +318,7 @@ public class LikeWorkContract {
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ANSWER;
 
-        public static final String TABLE_NAME           = "questions";
+        public static final String TABLE_NAME           = "answers";
 
         public static final String COLUMN_QUESTION_ID   = "question_id";
         public static final String COLUMN_ID_1C         = "_id_1c";

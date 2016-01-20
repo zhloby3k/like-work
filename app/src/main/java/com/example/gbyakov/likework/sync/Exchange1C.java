@@ -255,6 +255,31 @@ public class Exchange1C {
 
     }
 
+    public void UpdateQuestions() {
+
+        String response = SendRequest("GetQuestions");
+        if (!response.equals("")){
+            Log.d(LOG_TAG, "UpdateQuestions - start");
+            mContext.getContentResolver().delete(LikeWorkContract.QuestionEntry.CONTENT_URI, null, null);
+            mContext.getContentResolver().delete(LikeWorkContract.AnswerEntry.CONTENT_URI, null, null);
+            Log.d(LOG_TAG, "UpdateQuestions - trancate tables");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            try {
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document dom = builder.parse(new ByteArrayInputStream(response.getBytes()));
+                Element root = dom.getDocumentElement();
+                NodeList items = root.getElementsByTagName("m:question");
+                for (int i=0;i<items.getLength();i++){
+                    Question(items.item(i));
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            Log.d(LOG_TAG, "UpdateQuestions - finish");
+        }
+
+    }
+
     private static String Order(Node orderNode) throws ParseException {
 
         ContentValues orderValues = new ContentValues();
@@ -286,14 +311,13 @@ public class Exchange1C {
             }
             else if(attr.getNodeName().equalsIgnoreCase("m:reason")) {
                 orderValues.put(LikeWorkContract.OrderEntry.COLUMN_REASON, attr.getTextContent());
-            }
-            else if(attr.getNodeName().equalsIgnoreCase("m:car")) {
+            } else if (attr.getNodeName().equalsIgnoreCase("m:car")) {
                 orderValues.put(LikeWorkContract.OrderEntry.COLUMN_CAR_ID, Car(attr));
             }
             else if(attr.getNodeName().equalsIgnoreCase("m:customer")) {
                 orderValues.put(LikeWorkContract.OrderEntry.COLUMN_CUSTOMER_ID, Client(attr));
             }
-            else if(attr.getNodeName().equalsIgnoreCase("m:client")) {
+            else if (attr.getNodeName().equalsIgnoreCase("m:client")) {
                 orderValues.put(LikeWorkContract.OrderEntry.COLUMN_CLIENT_ID, Client(attr));
             }
             else if(attr.getNodeName().equalsIgnoreCase("m:status")) {
@@ -370,7 +394,7 @@ public class Exchange1C {
         }
 
         String selection = LikeWorkContract.RecordEntry.TABLE_NAME + "." +
-                            LikeWorkContract.RecordEntry.COLUMN_ID_1C + " = ?";
+                LikeWorkContract.RecordEntry.COLUMN_ID_1C + " = ?";
         String[] selectionArgs = {recordID};
 
         String[] projection = {
@@ -703,6 +727,61 @@ public class Exchange1C {
         }
 
         return statusID;
+    }
+
+    private static void Question(Node questionNode) {
+
+        ContentValues newValues = new ContentValues();
+        NodeList attrs = questionNode.getChildNodes();
+        String questionID = "";
+
+        for (int i = 0; i < attrs.getLength(); i++) {
+            Node attr = attrs.item(i);
+            if (attr.getNodeName().equalsIgnoreCase("m:id")) {
+                newValues.put(LikeWorkContract.QuestionEntry.COLUMN_ID_1C, attr.getTextContent());
+                questionID = attr.getTextContent();
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:interview_ID")) {
+                newValues.put(LikeWorkContract.QuestionEntry.COLUMN_INTERVIEW_ID, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:name")) {
+                newValues.put(LikeWorkContract.QuestionEntry.COLUMN_NAME, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:text")) {
+                newValues.put(LikeWorkContract.QuestionEntry.COLUMN_SPEECH, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:options")) {
+                Element element = (Element) attrs.item(i);
+                NodeList options = element.getElementsByTagName("m:option");
+                for (int k=0;k<options.getLength();k++){
+                    Answer(options.item(k), questionID);
+                }
+            }
+        }
+
+        mContext.getContentResolver().insert(LikeWorkContract.QuestionEntry.CONTENT_URI, newValues);
+
+    }
+
+    private static void Answer(Node answerNode, String questionID) {
+
+        ContentValues newValues = new ContentValues();
+        NodeList attrs = answerNode.getChildNodes();
+
+        for (int i = 0; i < attrs.getLength(); i++) {
+            Node attr = attrs.item(i);
+            if (attr.getNodeName().equalsIgnoreCase("m:id")) {
+                newValues.put(LikeWorkContract.AnswerEntry.COLUMN_ID_1C, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:name")) {
+                newValues.put(LikeWorkContract.AnswerEntry.COLUMN_NAME, attr.getTextContent());
+            }
+        }
+
+        newValues.put(LikeWorkContract.AnswerEntry.COLUMN_QUESTION_ID, questionID);
+
+        mContext.getContentResolver().insert(LikeWorkContract.AnswerEntry.CONTENT_URI, newValues);
+
     }
 
     private static boolean dataChanged(Cursor valueCursor, ContentValues expectedValues) {

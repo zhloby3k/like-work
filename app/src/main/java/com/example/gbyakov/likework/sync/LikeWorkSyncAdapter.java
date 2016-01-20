@@ -43,6 +43,7 @@ public class LikeWorkSyncAdapter extends AbstractThreadedSyncAdapter {
         mExchange.UpdateStates();
         mExchange.UpdateParts();
         mExchange.UpdateOperations();
+        mExchange.UpdateQuestions();
 
         Log.d(LOG_TAG, "End sync");
 
