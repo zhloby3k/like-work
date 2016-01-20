@@ -19,7 +19,9 @@ public class LikeWorkContract {
     public static final String PATH_STATUS  = "status";
     public static final String PATH_STATE   = "state";
     public static final String PATH_PART    = "part";
-    public static final String PATH_OPERATION  = "operation";
+    public static final String PATH_OPERATION   = "operation";
+    public static final String PATH_QUESTION    = "question";
+    public static final String PATH_ANSWER  = "answer";
 
     public static final class OrderEntry implements BaseColumns {
 
@@ -280,4 +282,58 @@ public class LikeWorkContract {
         }
     }
 
+    public static final class QuestionEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_QUESTION).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_QUESTION;
+
+        public static final String TABLE_NAME           = "questions";
+
+        public static final String COLUMN_INTERVIEW_ID  = "interview_id";
+        public static final String COLUMN_ID_1C         = "_id_1c";
+        public static final String COLUMN_NAME          = "name";
+        public static final String COLUMN_SPEECH        = "speech";
+
+        public static Uri buildUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildInterviewUri(String InterviewId) {
+            return CONTENT_URI.buildUpon().appendPath(InterviewId).build();
+        }
+
+        public static String getInterviewFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+    }
+
+    public static final class AnswerEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_ANSWER).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ANSWER;
+
+        public static final String TABLE_NAME           = "questions";
+
+        public static final String COLUMN_QUESTION_ID   = "question_id";
+        public static final String COLUMN_ID_1C         = "_id_1c";
+        public static final String COLUMN_NAME          = "name";
+
+        public static Uri buildUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildQuestionUri(String QuestionId) {
+            return CONTENT_URI.buildUpon().appendPath(QuestionId).build();
+        }
+
+        public static String getInterviewFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+    }
 }

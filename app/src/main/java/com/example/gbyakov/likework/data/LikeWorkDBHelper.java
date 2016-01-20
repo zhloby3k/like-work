@@ -4,12 +4,14 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.gbyakov.likework.data.LikeWorkContract.AnswerEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.CallEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.CarEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.ClientEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.OperationEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.OrderEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.PartEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.QuestionEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.RecordEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.StateEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.StatusEntry;
@@ -122,6 +124,21 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
                 OperationEntry.COLUMN_STATUS + " TEXT NOT NULL " +
                 " );";
 
+        final String SQL_CREATE_QUESTION_TABLE = "CREATE TABLE " + QuestionEntry.TABLE_NAME + " (" +
+                QuestionEntry._ID + " INTEGER PRIMARY KEY," +
+                QuestionEntry.COLUMN_ID_1C + " TEXT UNIQUE NOT NULL, " +
+                QuestionEntry.COLUMN_INTERVIEW_ID + " TEXT NOT NULL " +
+                QuestionEntry.COLUMN_NAME + " TEXT NOT NULL " +
+                QuestionEntry.COLUMN_SPEECH + " TEXT NOT NULL " +
+                " );";
+
+        final String SQL_CREATE_ANSWER_TABLE = "CREATE TABLE " + AnswerEntry.TABLE_NAME + " (" +
+                AnswerEntry._ID + " INTEGER PRIMARY KEY," +
+                AnswerEntry.COLUMN_ID_1C + " TEXT UNIQUE NOT NULL, " +
+                AnswerEntry.COLUMN_QUESTION_ID + " TEXT NOT NULL " +
+                AnswerEntry.COLUMN_NAME + " TEXT NOT NULL " +
+                " );";
+
         db.execSQL(SQL_CREATE_ORDER_TABLE);
         db.execSQL(SQL_CREATE_RECORD_TABLE);
         db.execSQL(SQL_CREATE_CALL_TABLE);
@@ -131,6 +148,9 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_STATE_TABLE);
         db.execSQL(SQL_CREATE_PART_TABLE);
         db.execSQL(SQL_CREATE_OPERATION_TABLE);
+        db.execSQL(SQL_CREATE_QUESTION_TABLE);
+        db.execSQL(SQL_CREATE_ANSWER_TABLE);
+
     }
 
     @Override
@@ -145,6 +165,8 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + StateEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + PartEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + OperationEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + QuestionEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + AnswerEntry.TABLE_NAME);
         onCreate(db);
 
     }
