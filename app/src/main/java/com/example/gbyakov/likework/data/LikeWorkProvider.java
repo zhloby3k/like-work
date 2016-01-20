@@ -468,7 +468,7 @@ public class LikeWorkProvider extends ContentProvider {
             }
             case ANSWER_OF_QUESTION: {
                 selection = AnswerEntry.TABLE_NAME + "." + AnswerEntry.COLUMN_QUESTION_ID + " = ?";
-                selectionArgs = new String[] {AnswerEntry.getInterviewFromUri(uri)};
+                selectionArgs = new String[] {AnswerEntry.getQuestionFromUri(uri)};
 
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         AnswerEntry.TABLE_NAME,

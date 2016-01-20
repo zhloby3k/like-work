@@ -332,7 +332,7 @@ public class LikeWorkContract {
             return CONTENT_URI.buildUpon().appendPath(QuestionId).build();
         }
 
-        public static String getInterviewFromUri(Uri uri) {
+        public static String getQuestionFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
         }
     }

@@ -1,5 +1,7 @@
 package com.example.gbyakov.likework.fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.example.gbyakov.likework.R;
@@ -20,11 +24,14 @@ import com.example.gbyakov.likework.data.LikeWorkContract;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
-public class CallItemFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class CallItemFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
+        View.OnClickListener,
+        DialogInterface.OnClickListener {
 
     public static final String CALL_URI = "URI";
     private static final int CALL_LOADER = 0;
     private static final int QUESTIONS_LOADER = 1;
+    private static final int ANSWERS_LOADER = 2;
 
     private static final String[] CALL_COLUMNS = {
             LikeWorkContract.CallEntry.TABLE_NAME + "." + LikeWorkContract.CallEntry._ID,
@@ -39,12 +46,18 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
             LikeWorkContract.CarEntry.COLUMN_REGNUMBER,
     };
 
+    private static final String[] QUESTION_COLUMNS = {
+            LikeWorkContract.QuestionEntry.TABLE_NAME + "." + LikeWorkContract.QuestionEntry.COLUMN_ID_1C,
+            LikeWorkContract.QuestionEntry.COLUMN_NAME
+    };
+
     private TextView mClientView;
     private TextView mCarView;
     private TextView mCommentView;
     private TextView mTypeView;
     private TextView mSumView;
     private LinearLayout mContainer;
+    private View mQuestion;
 
     private Uri mUri;
     private String mDocId;
@@ -94,6 +107,16 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
             return new CursorLoader(
                     getActivity(),
                     LikeWorkContract.QuestionEntry.buildInterviewUri(callID),
+                    QUESTION_COLUMNS,
+                    null,
+                    null,
+                    null
+            );
+        } else if ( id == ANSWERS_LOADER ) {
+            String qID = (String) mQuestion.getTag();
+            return new CursorLoader(
+                    getActivity(),
+                    LikeWorkContract.AnswerEntry.buildQuestionUri(qID),
                     null,
                     null,
                     null,
@@ -142,16 +165,32 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
                 View element = ltInflater.inflate(
                         R.layout.question_item, null, false);
 
+                String qID = data.getString(data.getColumnIndex(LikeWorkContract.QuestionEntry.COLUMN_ID_1C));
+
+                element.setTag(qID);
+                element.setOnClickListener(this);
+
                 TextView qHeader= (TextView) element.findViewById(R.id.question_header);
                 String qName = data.getString(data.getColumnIndex(LikeWorkContract.QuestionEntry.COLUMN_NAME));
                 qHeader.setText(qName);
 
                 TextView qAnswer = (TextView) element.findViewById(R.id.question_answer);
-                qAnswer.setText("Нет");
+                qAnswer.setText("");
 
                 mContainer.addView(element);
 
             }
+
+        } else if (loader.getId() == ANSWERS_LOADER && data != null) {
+
+            TextView qHeader= (TextView) mQuestion.findViewById(R.id.question_header);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(qHeader.getText());
+            builder.setCursor(data, this, LikeWorkContract.AnswerEntry.COLUMN_NAME);
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
 
         }
 
@@ -159,6 +198,30 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        mQuestion = v;
+        getLoaderManager().restartLoader(ANSWERS_LOADER, null, this);
+
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+
+        TextView qAnswer = (TextView) mQuestion.findViewById(R.id.question_answer);
+
+        ListView lv = ((AlertDialog) dialog).getListView();
+        Cursor cursor = ((SimpleCursorAdapter) lv.getAdapter()).getCursor();
+        cursor.moveToPosition(which);
+
+        String aName = cursor.getString(cursor.getColumnIndex(LikeWorkContract.AnswerEntry.COLUMN_NAME));
+        String aID   = cursor.getString(cursor.getColumnIndex(LikeWorkContract.AnswerEntry.COLUMN_ID_1C));
+        qAnswer.setText(aName);
+        qAnswer.setTag(aID);
 
     }
 }

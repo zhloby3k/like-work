@@ -218,10 +218,10 @@
                 android:orientation="horizontal"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:layout_width="fill_parent">
 
                 <FrameLayout
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:layout_width="24dp"
                     android:layout_height="24dp">
 
@@ -236,9 +236,13 @@
                     android:id="@+id/call_comment_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginTop="4dp"
                     style="@style/TextAppearance.AppCompat.Body1"
-                    android:text="fgnsgjsfj tghsw rtht thseth sdth stdh stdh sth sth"/>
+                    android:inputType="textMultiLine"
+                    android:hint="Введите комментарий"
+                    android:gravity="clip_horizontal"
+                    android:textColor="@color/colorAccent" />
 
             </LinearLayout>
 
