@@ -18,7 +18,7 @@ import com.example.gbyakov.likework.data.LikeWorkContract.StatusEntry;
 
 public class LikeWorkDBHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     static final String DATABASE_NAME = "likework.db";
 
@@ -134,7 +134,7 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_ANSWER_TABLE = "CREATE TABLE " + AnswerEntry.TABLE_NAME + " (" +
                 AnswerEntry._ID + " INTEGER PRIMARY KEY," +
-                AnswerEntry.COLUMN_ID_1C + " TEXT UNIQUE NOT NULL, " +
+                AnswerEntry.COLUMN_ID_1C + " TEXT NOT NULL, " +
                 AnswerEntry.COLUMN_QUESTION_ID + " TEXT NOT NULL, " +
                 AnswerEntry.COLUMN_NAME + " TEXT NOT NULL " +
                 " );";

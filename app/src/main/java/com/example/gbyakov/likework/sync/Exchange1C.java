@@ -259,10 +259,10 @@ public class Exchange1C {
 
         String response = SendRequest("GetQuestions");
         if (!response.equals("")){
-            Log.d(LOG_TAG, "UpdateQuestions - start");
+            Log.d(LOG_TAG, "GetQuestions - start");
             mContext.getContentResolver().delete(LikeWorkContract.QuestionEntry.CONTENT_URI, null, null);
             mContext.getContentResolver().delete(LikeWorkContract.AnswerEntry.CONTENT_URI, null, null);
-            Log.d(LOG_TAG, "UpdateQuestions - trancate tables");
+            Log.d(LOG_TAG, "GetQuestions - trancate tables");
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             try {
                 DocumentBuilder builder = factory.newDocumentBuilder();
@@ -275,7 +275,7 @@ public class Exchange1C {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            Log.d(LOG_TAG, "UpdateQuestions - finish");
+            Log.d(LOG_TAG, "GetQuestions - finish");
         }
 
     }
@@ -389,7 +389,7 @@ public class Exchange1C {
                 recordValues.put(LikeWorkContract.RecordEntry.COLUMN_CLIENT_ID, Client(attr));
             }
             else if(attr.getNodeName().equalsIgnoreCase("m:done")) {
-                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_DONE, (attr.getTextContent().equals("true")) ? 1 : 0);
+                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_DONE, (attr.getTextContent().equals("1")) ? 1 : 0);
             }
         }
 

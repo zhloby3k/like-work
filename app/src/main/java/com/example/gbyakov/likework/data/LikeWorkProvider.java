@@ -433,11 +433,18 @@ public class LikeWorkProvider extends ContentProvider {
                 break;
             }
             case QUESTION_OF_DOC: {
-                selection = QuestionEntry.TABLE_NAME + "." + QuestionEntry.COLUMN_INTERVIEW_ID + " = ?";
+
+                SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
+                qBuilder.setTables(QuestionEntry.TABLE_NAME +
+                                " INNER JOIN " + CallEntry.TABLE_NAME +
+                                " ON " + CallEntry.TABLE_NAME + "." + CallEntry.COLUMN_INTERVIEW_ID +
+                                " = " + QuestionEntry.TABLE_NAME + "." + QuestionEntry.COLUMN_INTERVIEW_ID
+                );
+
+                selection = CallEntry.TABLE_NAME + "." + CallEntry._ID + " = ?";
                 selectionArgs = new String[] {QuestionEntry.getInterviewFromUri(uri)};
 
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        QuestionEntry.TABLE_NAME,
+                retCursor = qBuilder.query(mOpenHelper.getReadableDatabase(),
                         projection,
                         selection,
                         selectionArgs,

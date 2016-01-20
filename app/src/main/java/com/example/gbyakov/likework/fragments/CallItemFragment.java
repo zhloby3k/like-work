@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -20,12 +19,12 @@ import com.example.gbyakov.likework.data.LikeWorkContract;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
 
 public class CallItemFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String CALL_URI = "URI";
     private static final int CALL_LOADER = 0;
+    private static final int QUESTIONS_LOADER = 1;
 
     private static final String[] CALL_COLUMNS = {
             LikeWorkContract.CallEntry.TABLE_NAME + "." + LikeWorkContract.CallEntry._ID,
@@ -73,12 +72,15 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         getLoaderManager().initLoader(CALL_LOADER, null, this);
+        getLoaderManager().initLoader(QUESTIONS_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if ( mUri != null ) {
+        if ( mUri == null ) {
+            return null;
+        } else if ( id == CALL_LOADER ) {
             return new CursorLoader(
                     getActivity(),
                     mUri,
@@ -87,12 +89,23 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
                     null,
                     null
             );
+        } else if ( id == QUESTIONS_LOADER ) {
+            String callID = LikeWorkContract.CallEntry.getIDFromUri(mUri);
+            return new CursorLoader(
+                    getActivity(),
+                    LikeWorkContract.QuestionEntry.buildInterviewUri(callID),
+                    null,
+                    null,
+                    null,
+                    null
+            );
         }
-        return null;    }
+        return null;
+    }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (data != null && data.moveToFirst()) {
+        if (loader.getId() == CALL_LOADER && data != null && data.moveToFirst()) {
 
             String carBrand  = data.getString(data.getColumnIndex(LikeWorkContract.CarEntry.COLUMN_BRAND));
             String carModel = data.getString(data.getColumnIndex(LikeWorkContract.CarEntry.COLUMN_MODEL));
@@ -120,24 +133,18 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
             android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
             if (actionBar != null) actionBar.setTitle("Звонок заботы");
 
-            ArrayList<String> spinnerArray = new ArrayList<>();
-            spinnerArray.add("one");
-            spinnerArray.add("two");
-            spinnerArray.add("three");
-            spinnerArray.add("four");
-            spinnerArray.add("five");
-
-            ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, spinnerArray);
+        } else if (loader.getId() == QUESTIONS_LOADER && data != null) {
 
             LayoutInflater ltInflater = getLayoutInflater(null);
 
-            for (int i = 0; i < 3; i++) {
+            while (data.moveToNext()) {
 
                 View element = ltInflater.inflate(
                         R.layout.question_item, null, false);
 
                 TextView qHeader= (TextView) element.findViewById(R.id.question_header);
-                qHeader.setText("Вопрос №"+Integer.toString(i));
+                String qName = data.getString(data.getColumnIndex(LikeWorkContract.QuestionEntry.COLUMN_NAME));
+                qHeader.setText(qName);
 
                 TextView qAnswer = (TextView) element.findViewById(R.id.question_answer);
                 qAnswer.setText("Нет");
@@ -147,6 +154,7 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
             }
 
         }
+
     }
 
     @Override
