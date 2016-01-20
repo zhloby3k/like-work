@@ -11,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.gbyakov.likework.R;
@@ -18,6 +20,7 @@ import com.example.gbyakov.likework.data.LikeWorkContract;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
 
 public class CallItemFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -42,6 +45,7 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
     private TextView mCommentView;
     private TextView mTypeView;
     private TextView mSumView;
+    private LinearLayout mContainer;
 
     private Uri mUri;
     private String mDocId;
@@ -60,6 +64,8 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
         mCommentView = (TextView) rootView.findViewById(R.id.call_comment);
         mTypeView = (TextView) rootView.findViewById(R.id.call_type);
         mSumView = (TextView) rootView.findViewById(R.id.call_sum);
+
+        mContainer = (LinearLayout) rootView.findViewById(R.id.questions_container);
 
         return rootView;
     }
@@ -113,6 +119,32 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
 
             android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
             if (actionBar != null) actionBar.setTitle("Звонок заботы");
+
+            ArrayList<String> spinnerArray = new ArrayList<>();
+            spinnerArray.add("one");
+            spinnerArray.add("two");
+            spinnerArray.add("three");
+            spinnerArray.add("four");
+            spinnerArray.add("five");
+
+            ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, spinnerArray);
+
+            LayoutInflater ltInflater = getLayoutInflater(null);
+
+            for (int i = 0; i < 3; i++) {
+
+                View element = ltInflater.inflate(
+                        R.layout.question_item, null, false);
+
+                TextView qHeader= (TextView) element.findViewById(R.id.question_header);
+                qHeader.setText("Вопрос №"+Integer.toString(i));
+
+                TextView qAnswer = (TextView) element.findViewById(R.id.question_answer);
+                qAnswer.setText("Нет");
+
+                mContainer.addView(element);
+
+            }
 
         }
     }
