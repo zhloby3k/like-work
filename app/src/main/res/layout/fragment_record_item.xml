@@ -260,11 +260,12 @@
         <TextView
             android:id="@+id/record_comment"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:text="пока не планирует проводить гарантийный ремонт, возможно будет делать в ноябре 30.11.15"
             style="@style/TextAppearance.AppCompat.Body1"
-            android:ellipsize="end" />
+            android:ellipsize="end"
+            android:lines="2" />
 
     </LinearLayout>
 

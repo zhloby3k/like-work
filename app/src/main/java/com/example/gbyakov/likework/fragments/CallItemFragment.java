@@ -3,6 +3,7 @@ package com.example.gbyakov.likework.fragments;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,18 +12,24 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.gbyakov.likework.R;
 import com.example.gbyakov.likework.data.LikeWorkContract;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
 
 public class CallItemFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
         View.OnClickListener,
@@ -58,9 +65,40 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
     private TextView mSumView;
     private LinearLayout mContainer;
     private View mQuestion;
+    private ArrayList<View> qList;
 
     private Uri mUri;
     private String mDocId;
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.call_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.save_call:
+
+                Boolean errors = false;
+                for (View v:qList) {
+                    TextView qHeader= (TextView) v.findViewById(R.id.question_header);
+                    TextView qAnswer = (TextView) v.findViewById(R.id.question_answer);
+                    if (qAnswer.getTag() == null) {
+                        errors = true;
+                    }
+                }
+                if (errors) {
+                    Toast.makeText(getActivity(), "Не заполнены ответы на некоторые вопросы",
+                            Toast.LENGTH_LONG).show();
+                    return false;
+                }
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -69,6 +107,8 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
         if (arguments != null) {
             mUri = arguments.getParcelable(CALL_URI);
         }
+
+        setHasOptionsMenu(true);
 
         View rootView = inflater.inflate(R.layout.fragment_call_item, container, false);
         mClientView = (TextView) rootView.findViewById(R.id.call_client);
@@ -159,6 +199,7 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
         } else if (loader.getId() == QUESTIONS_LOADER && data != null) {
 
             LayoutInflater ltInflater = getLayoutInflater(null);
+            qList = new ArrayList<>();
 
             while (data.moveToNext()) {
 
@@ -176,6 +217,8 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
 
                 TextView qAnswer = (TextView) element.findViewById(R.id.question_answer);
                 qAnswer.setText("");
+
+                qList.add(element);
 
                 mContainer.addView(element);
 
@@ -222,6 +265,11 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
         String aID   = cursor.getString(cursor.getColumnIndex(LikeWorkContract.AnswerEntry.COLUMN_ID_1C));
         qAnswer.setText(aName);
         qAnswer.setTag(aID);
+
+        ImageView image = (ImageView) mQuestion.findViewById(R.id.question_logo);
+        TransitionDrawable drawable = (TransitionDrawable) image.getDrawable();
+        drawable.setCrossFadeEnabled(true);
+        drawable.startTransition(500);
 
     }
 }
