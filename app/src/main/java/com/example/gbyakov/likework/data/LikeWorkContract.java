@@ -22,6 +22,7 @@ public class LikeWorkContract {
     public static final String PATH_OPERATION   = "operation";
     public static final String PATH_QUESTION    = "question";
     public static final String PATH_ANSWER  = "answer";
+    public static final String PATH_REPLY   = "reply";
 
     public static final class OrderEntry implements BaseColumns {
 
@@ -125,6 +126,7 @@ public class LikeWorkContract {
         public static final String COLUMN_REASON        = "reason";
         public static final String COLUMN_SUM           = "sum";
         public static final String COLUMN_INTERVIEW_ID  = "interview_id";
+        public static final String COLUMN_DONE          = "done";
 
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -336,4 +338,26 @@ public class LikeWorkContract {
             return uri.getPathSegments().get(1);
         }
     }
+
+    public static final class ReplyEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_REPLY).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REPLY;
+
+        public static final String TABLE_NAME           = "replies";
+
+        public static final String COLUMN_CALL_ID       = "call_id";
+        public static final String COLUMN_INTERVIEW_ID  = "interview_id";
+        public static final String COLUMN_QUESTION_ID   = "question_id";
+        public static final String COLUMN_ANSWER_ID     = "answer_id";
+        public static final String COLUMN_COMMENT       = "comment";
+
+        public static Uri buildUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
 }

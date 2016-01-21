@@ -468,6 +468,8 @@ public class Exchange1C {
             }
         }
 
+        CallValues.put(LikeWorkContract.CallEntry.COLUMN_DONE, 0);
+
         String[] projection = {
                 LikeWorkContract.CallEntry.TABLE_NAME + "." + LikeWorkContract.CallEntry._ID,
                 LikeWorkContract.CallEntry.TABLE_NAME + "." + LikeWorkContract.CallEntry.COLUMN_ID_1C,

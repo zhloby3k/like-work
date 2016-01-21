@@ -13,6 +13,7 @@ import com.example.gbyakov.likework.data.LikeWorkContract.OrderEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.PartEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.QuestionEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.RecordEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.ReplyEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.StateEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.StatusEntry;
 
@@ -68,6 +69,7 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
                 CallEntry.COLUMN_TYPE + " TEXT NOT NULL, " +
                 CallEntry.COLUMN_REASON + " TEXT NOT NULL, " +
                 CallEntry.COLUMN_SUM + " REAL NOT NULL, " +
+                CallEntry.COLUMN_DONE + " INTEGER NOT NULL, " +
                 CallEntry.COLUMN_INTERVIEW_ID + " TEXT NOT NULL " +
                 " );";
 
@@ -139,6 +141,15 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
                 AnswerEntry.COLUMN_NAME + " TEXT NOT NULL " +
                 " );";
 
+        final String SQL_CREATE_REPLY_TABLE = "CREATE TABLE " + ReplyEntry.TABLE_NAME + " (" +
+                ReplyEntry._ID + " INTEGER PRIMARY KEY," +
+                ReplyEntry.COLUMN_CALL_ID + " TEXT NOT NULL, " +
+                ReplyEntry.COLUMN_INTERVIEW_ID + " TEXT NOT NULL, " +
+                ReplyEntry.COLUMN_QUESTION_ID + " TEXT NOT NULL, " +
+                ReplyEntry.COLUMN_ANSWER_ID + " TEXT NOT NULL, " +
+                ReplyEntry.COLUMN_COMMENT + " TEXT NOT NULL " +
+                " );";
+
         db.execSQL(SQL_CREATE_ORDER_TABLE);
         db.execSQL(SQL_CREATE_RECORD_TABLE);
         db.execSQL(SQL_CREATE_CALL_TABLE);
@@ -150,6 +161,7 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_OPERATION_TABLE);
         db.execSQL(SQL_CREATE_QUESTION_TABLE);
         db.execSQL(SQL_CREATE_ANSWER_TABLE);
+        db.execSQL(SQL_CREATE_REPLY_TABLE);
 
     }
 
@@ -167,6 +179,7 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + OperationEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + QuestionEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + AnswerEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ReplyEntry.TABLE_NAME);
         onCreate(db);
 
     }

@@ -1,6 +1,7 @@
 package com.example.gbyakov.likework.fragments;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.drawable.TransitionDrawable;
@@ -47,6 +48,7 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
             LikeWorkContract.CallEntry.COLUMN_REASON,
             LikeWorkContract.CallEntry.COLUMN_SUM,
             LikeWorkContract.CallEntry.COLUMN_TYPE,
+            LikeWorkContract.CallEntry.COLUMN_INTERVIEW_ID,
             "Client."+LikeWorkContract.ClientEntry.COLUMN_NAME + " ClientName",
             LikeWorkContract.CarEntry.COLUMN_BRAND,
             LikeWorkContract.CarEntry.COLUMN_MODEL,
@@ -68,7 +70,8 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
     private ArrayList<View> qList;
 
     private Uri mUri;
-    private String mDocId;
+    private String mCallID;
+    private String mInterviewID;
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -94,6 +97,30 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
                             Toast.LENGTH_LONG).show();
                     return false;
                 }
+
+                for (View v:qList) {
+                    TextView qAnswer = (TextView) v.findViewById(R.id.question_answer);
+
+                    ContentValues newValues = new ContentValues();
+                    newValues.put(LikeWorkContract.ReplyEntry.COLUMN_CALL_ID, mCallID);
+                    newValues.put(LikeWorkContract.ReplyEntry.COLUMN_INTERVIEW_ID, mInterviewID);
+                    newValues.put(LikeWorkContract.ReplyEntry.COLUMN_QUESTION_ID, (String) v.getTag());
+                    newValues.put(LikeWorkContract.ReplyEntry.COLUMN_ANSWER_ID, (String) qAnswer.getTag());
+                    newValues.put(LikeWorkContract.ReplyEntry.COLUMN_COMMENT, qAnswer.getText().toString());
+
+                    getContext().getContentResolver().insert(LikeWorkContract.ReplyEntry.CONTENT_URI, newValues);
+                }
+
+                ContentValues newValues = new ContentValues();
+                newValues.put(LikeWorkContract.CallEntry.COLUMN_DONE, 1);
+
+                String selection = LikeWorkContract.CallEntry.TABLE_NAME + "." +
+                                     LikeWorkContract.CallEntry.COLUMN_ID_1C + " = ?";
+                String[] selectionArgs = {mCallID};
+
+                getContext().getContentResolver().update(LikeWorkContract.CallEntry.CONTENT_URI, newValues, selection, selectionArgs);
+
+                getFragmentManager().popBackStackImmediate();
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -192,6 +219,9 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
 
             String comment = data.getString(data.getColumnIndex(LikeWorkContract.CallEntry.COLUMN_REASON));
             mCommentView.setText(comment);
+
+            mCallID = data.getString(data.getColumnIndex(LikeWorkContract.CallEntry.COLUMN_ID_1C));
+            mInterviewID = data.getString(data.getColumnIndex(LikeWorkContract.CallEntry.COLUMN_INTERVIEW_ID));
 
             android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
             if (actionBar != null) actionBar.setTitle("Звонок заботы");

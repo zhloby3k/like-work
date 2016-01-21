@@ -17,6 +17,7 @@ import com.example.gbyakov.likework.data.LikeWorkContract.OrderEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.PartEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.QuestionEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.RecordEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.ReplyEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.StateEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.StatusEntry;
 
@@ -46,7 +47,7 @@ public class LikeWorkProvider extends ContentProvider {
     static final int QUESTION_OF_DOC    = 431;
     static final int ANSWER             = 440;
     static final int ANSWER_OF_QUESTION = 441;
-
+    static final int REPLY              = 450;
 
     static final int CAR                = 1;
     static final int CLIENT             = 2;
@@ -76,6 +77,7 @@ public class LikeWorkProvider extends ContentProvider {
         matcher.addURI(authority, LikeWorkContract.PATH_QUESTION + "/*",        QUESTION_OF_DOC);
         matcher.addURI(authority, LikeWorkContract.PATH_ANSWER,                 ANSWER);
         matcher.addURI(authority, LikeWorkContract.PATH_ANSWER + "/*",          ANSWER_OF_QUESTION);
+        matcher.addURI(authority, LikeWorkContract.PATH_REPLY,                  REPLY);
 
         matcher.addURI(authority, LikeWorkContract.PATH_CAR,                    CAR);
         matcher.addURI(authority, LikeWorkContract.PATH_CLIENT,                 CLIENT);
@@ -481,6 +483,18 @@ public class LikeWorkProvider extends ContentProvider {
                 );
                 break;
             }
+            case REPLY: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        ReplyEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -523,6 +537,8 @@ public class LikeWorkProvider extends ContentProvider {
                 return ClientEntry.CONTENT_TYPE;
             case ANSWER:
                 return StatusEntry.CONTENT_TYPE;
+            case REPLY:
+                return ReplyEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -625,6 +641,14 @@ public class LikeWorkProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
+            case REPLY: {
+                long _id = db.insert(ReplyEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = ReplyEntry.buildUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -673,6 +697,9 @@ public class LikeWorkProvider extends ContentProvider {
                 break;
             case ANSWER:
                 rowsDeleted = db.delete(AnswerEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case REPLY:
+                rowsDeleted = db.delete(ReplyEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -734,6 +761,10 @@ public class LikeWorkProvider extends ContentProvider {
                 break;
             case ANSWER:
                 rowsUpdated = db.update(AnswerEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+            case REPLY:
+                rowsUpdated = db.update(ReplyEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
             default:

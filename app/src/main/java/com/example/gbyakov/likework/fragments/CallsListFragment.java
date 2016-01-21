@@ -33,6 +33,7 @@ public class CallsListFragment extends Fragment implements LoaderManager.LoaderC
             LikeWorkContract.CallEntry.TABLE_NAME + "." + LikeWorkContract.CallEntry._ID,
             LikeWorkContract.CallEntry.COLUMN_DATE,
             LikeWorkContract.CallEntry.COLUMN_REASON,
+            LikeWorkContract.CallEntry.COLUMN_DONE,
             LikeWorkContract.CarEntry.COLUMN_MODEL,
             LikeWorkContract.CarEntry.COLUMN_REGNUMBER,
             "Client." + LikeWorkContract.ClientEntry.COLUMN_NAME + " " + LikeWorkContract.ClientEntry.COLUMN_NAME
