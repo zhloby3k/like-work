@@ -26,12 +26,14 @@ public class CallAdapter extends CursorAdapter {
         public final TextView carView;
         public final TextView clientView;
         public final TextView detailsView;
+        public final ImageView statusView;
 
         public ViewHolder(View view) {
             dateView    = (TextView) view.findViewById(R.id.list_item_call_date);
             carView     = (TextView) view.findViewById(R.id.list_item_call_car);
             clientView  = (TextView) view.findViewById(R.id.list_item_call_client);
             detailsView = (TextView) view.findViewById(R.id.list_item_call_detail);
+            statusView  = (ImageView) view.findViewById(R.id.list_item_call_status);
         }
     }
 
@@ -65,6 +67,9 @@ public class CallAdapter extends CursorAdapter {
 
         String details   = cursor.getString(cursor.getColumnIndex(LikeWorkContract.CallEntry.COLUMN_REASON));
         viewHolder.detailsView.setText(details);
+
+        int done         = cursor.getInt(cursor.getColumnIndex(LikeWorkContract.CallEntry.COLUMN_DONE));
+        viewHolder.statusView.setImageResource((done == 1) ? R.drawable.ic_check:0);
 
     }
 

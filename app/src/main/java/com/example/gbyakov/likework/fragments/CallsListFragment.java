@@ -1,6 +1,9 @@
 package com.example.gbyakov.likework.fragments;
 
+import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -10,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.gbyakov.likework.R;
@@ -21,6 +25,7 @@ public class CallsListFragment extends Fragment implements LoaderManager.LoaderC
     private CallAdapter mCallAdapter;
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;
+    OnItemSelectedListener mListener;
 
     private static final int CALL_LOADER = 0;
 
@@ -28,10 +33,16 @@ public class CallsListFragment extends Fragment implements LoaderManager.LoaderC
             LikeWorkContract.CallEntry.TABLE_NAME + "." + LikeWorkContract.CallEntry._ID,
             LikeWorkContract.CallEntry.COLUMN_DATE,
             LikeWorkContract.CallEntry.COLUMN_REASON,
+            LikeWorkContract.CallEntry.COLUMN_DONE,
             LikeWorkContract.CarEntry.COLUMN_MODEL,
             LikeWorkContract.CarEntry.COLUMN_REGNUMBER,
             "Client." + LikeWorkContract.ClientEntry.COLUMN_NAME + " " + LikeWorkContract.ClientEntry.COLUMN_NAME
     };
+
+
+    public interface OnItemSelectedListener {
+        void OnItemSelected(Uri itemUri);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -42,8 +53,21 @@ public class CallsListFragment extends Fragment implements LoaderManager.LoaderC
 
         mListView = (ListView) x.findViewById(R.id.calls_listview);
         mListView.setAdapter(mCallAdapter);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                if (cursor != null) {
+                    Integer id = cursor.getInt(cursor.getColumnIndex(LikeWorkContract.CallEntry._ID));
+                    Uri itemUri = LikeWorkContract.CallEntry.buildCallID(id);
+                    mListener.OnItemSelected(itemUri);
+                }
+                mPosition = position;
+            }
+        });
 
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Звонки заботы");
+        android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if (actionBar != null) actionBar.setTitle("Звонки заботы");
 
         return x;
     }
@@ -52,6 +76,20 @@ public class CallsListFragment extends Fragment implements LoaderManager.LoaderC
     public void onActivityCreated(Bundle savedInstanceState) {
         getLoaderManager().initLoader(CALL_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+
+        super.onAttach(context);
+        if (context instanceof Activity){
+            try {
+                mListener = (OnItemSelectedListener) context;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(context.toString() + " must implement OnItemSelectedListener");
+            }
+        }
+
     }
 
     @Override

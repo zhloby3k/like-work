@@ -8,13 +8,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
+import com.example.gbyakov.likework.data.LikeWorkContract.AnswerEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.CallEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.CarEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.ClientEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.OperationEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.OrderEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.PartEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.QuestionEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.RecordEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.ReplyEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.StateEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.StatusEntry;
 
@@ -40,6 +43,11 @@ public class LikeWorkProvider extends ContentProvider {
     static final int PART_OF_DOC        = 411;
     static final int OPERATION          = 420;
     static final int OPERATION_OF_DOC   = 421;
+    static final int QUESTION           = 430;
+    static final int QUESTION_OF_DOC    = 431;
+    static final int ANSWER             = 440;
+    static final int ANSWER_OF_QUESTION = 441;
+    static final int REPLY              = 450;
 
     static final int CAR                = 1;
     static final int CLIENT             = 2;
@@ -65,6 +73,11 @@ public class LikeWorkProvider extends ContentProvider {
         matcher.addURI(authority, LikeWorkContract.PATH_PART + "/*",            PART_OF_DOC);
         matcher.addURI(authority, LikeWorkContract.PATH_OPERATION,              OPERATION);
         matcher.addURI(authority, LikeWorkContract.PATH_OPERATION + "/*",       OPERATION_OF_DOC);
+        matcher.addURI(authority, LikeWorkContract.PATH_QUESTION,               QUESTION);
+        matcher.addURI(authority, LikeWorkContract.PATH_QUESTION + "/*",        QUESTION_OF_DOC);
+        matcher.addURI(authority, LikeWorkContract.PATH_ANSWER,                 ANSWER);
+        matcher.addURI(authority, LikeWorkContract.PATH_ANSWER + "/*",          ANSWER_OF_QUESTION);
+        matcher.addURI(authority, LikeWorkContract.PATH_REPLY,                  REPLY);
 
         matcher.addURI(authority, LikeWorkContract.PATH_CAR,                    CAR);
         matcher.addURI(authority, LikeWorkContract.PATH_CLIENT,                 CLIENT);
@@ -260,6 +273,31 @@ public class LikeWorkProvider extends ContentProvider {
                 );
                 break;
             }
+            case CALL_ID:
+            {
+                SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
+                qBuilder.setTables(CallEntry.TABLE_NAME +
+                                " LEFT JOIN " + CarEntry.TABLE_NAME +
+                                " ON " + CallEntry.TABLE_NAME + "." + CallEntry.COLUMN_CAR_ID +
+                                " = " + CarEntry.TABLE_NAME + "." + CarEntry.COLUMN_ID_1C +
+                                " LEFT JOIN " + ClientEntry.TABLE_NAME + " AS Client" +
+                                " ON " + CallEntry.TABLE_NAME + "." + CallEntry.COLUMN_CLIENT_ID +
+                                " = Client." + ClientEntry.COLUMN_ID_1C
+                );
+
+                selection = CallEntry.TABLE_NAME + "." + CallEntry._ID + " = ?";
+                selectionArgs = new String[] {CallEntry.getIDFromUri(uri)};
+
+                retCursor = qBuilder.query(mOpenHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
             case CAR: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         CarEntry.TABLE_NAME,
@@ -384,6 +422,79 @@ public class LikeWorkProvider extends ContentProvider {
                 );
                 break;
             }
+            case QUESTION: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        QuestionEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+            case QUESTION_OF_DOC: {
+
+                SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
+                qBuilder.setTables(QuestionEntry.TABLE_NAME +
+                                " INNER JOIN " + CallEntry.TABLE_NAME +
+                                " ON " + CallEntry.TABLE_NAME + "." + CallEntry.COLUMN_INTERVIEW_ID +
+                                " = " + QuestionEntry.TABLE_NAME + "." + QuestionEntry.COLUMN_INTERVIEW_ID
+                );
+
+                selection = CallEntry.TABLE_NAME + "." + CallEntry._ID + " = ?";
+                selectionArgs = new String[] {QuestionEntry.getInterviewFromUri(uri)};
+
+                retCursor = qBuilder.query(mOpenHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+            case ANSWER: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        AnswerEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+            case ANSWER_OF_QUESTION: {
+                selection = AnswerEntry.TABLE_NAME + "." + AnswerEntry.COLUMN_QUESTION_ID + " = ?";
+                selectionArgs = new String[] {AnswerEntry.getQuestionFromUri(uri)};
+
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        AnswerEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+            case REPLY: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        ReplyEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -422,6 +533,12 @@ public class LikeWorkProvider extends ContentProvider {
                 return ClientEntry.CONTENT_TYPE;
             case OPERATION:
                 return StatusEntry.CONTENT_TYPE;
+            case QUESTION:
+                return ClientEntry.CONTENT_TYPE;
+            case ANSWER:
+                return StatusEntry.CONTENT_TYPE;
+            case REPLY:
+                return ReplyEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -508,6 +625,30 @@ public class LikeWorkProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
+            case QUESTION: {
+                long _id = db.insert(QuestionEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = QuestionEntry.buildUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            case ANSWER: {
+                long _id = db.insert(AnswerEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = AnswerEntry.buildUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            case REPLY: {
+                long _id = db.insert(ReplyEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = ReplyEntry.buildUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -550,6 +691,15 @@ public class LikeWorkProvider extends ContentProvider {
                 break;
             case OPERATION:
                 rowsDeleted = db.delete(OperationEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case QUESTION:
+                rowsDeleted = db.delete(QuestionEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case ANSWER:
+                rowsDeleted = db.delete(AnswerEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case REPLY:
+                rowsDeleted = db.delete(ReplyEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -603,6 +753,18 @@ public class LikeWorkProvider extends ContentProvider {
                 break;
             case OPERATION:
                 rowsUpdated = db.update(OperationEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+            case QUESTION:
+                rowsUpdated = db.update(QuestionEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+            case ANSWER:
+                rowsUpdated = db.update(AnswerEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+            case REPLY:
+                rowsUpdated = db.update(ReplyEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
             default:

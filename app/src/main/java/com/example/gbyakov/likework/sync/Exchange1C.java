@@ -12,9 +12,14 @@ import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.NTLMSchemeFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.util.EntityUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -22,6 +27,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.ByteArrayInputStream;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -59,6 +67,24 @@ public class Exchange1C {
         try
         {
             DefaultHttpClient httpclient = new DefaultHttpClient();
+
+            URL url = new URL(mContext.getString(R.string.ws_link));
+            if ("https".equals(url.getProtocol())) {
+
+                HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+
+                DefaultHttpClient client = new DefaultHttpClient();
+
+                SchemeRegistry registry = new SchemeRegistry();
+                SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
+                socketFactory.setHostnameVerifier((X509HostnameVerifier) hostnameVerifier);
+                registry.register(new Scheme("https", socketFactory, 443));
+                SingleClientConnManager mgr = new SingleClientConnManager(client.getParams(), registry);
+                httpclient = new DefaultHttpClient(mgr, client.getParams());
+
+                HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier);
+            }
+
             httpclient.getAuthSchemes().register("ntlm", new NTLMSchemeFactory());
             httpclient.getCredentialsProvider().setCredentials(
                     new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
@@ -255,6 +281,31 @@ public class Exchange1C {
 
     }
 
+    public void UpdateQuestions() {
+
+        String response = SendRequest("GetQuestions");
+        if (!response.equals("")){
+            Log.d(LOG_TAG, "GetQuestions - start");
+            mContext.getContentResolver().delete(LikeWorkContract.QuestionEntry.CONTENT_URI, null, null);
+            mContext.getContentResolver().delete(LikeWorkContract.AnswerEntry.CONTENT_URI, null, null);
+            Log.d(LOG_TAG, "GetQuestions - trancate tables");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            try {
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document dom = builder.parse(new ByteArrayInputStream(response.getBytes()));
+                Element root = dom.getDocumentElement();
+                NodeList items = root.getElementsByTagName("m:question");
+                for (int i=0;i<items.getLength();i++){
+                    Question(items.item(i));
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            Log.d(LOG_TAG, "GetQuestions - finish");
+        }
+
+    }
+
     private static String Order(Node orderNode) throws ParseException {
 
         ContentValues orderValues = new ContentValues();
@@ -286,14 +337,13 @@ public class Exchange1C {
             }
             else if(attr.getNodeName().equalsIgnoreCase("m:reason")) {
                 orderValues.put(LikeWorkContract.OrderEntry.COLUMN_REASON, attr.getTextContent());
-            }
-            else if(attr.getNodeName().equalsIgnoreCase("m:car")) {
+            } else if (attr.getNodeName().equalsIgnoreCase("m:car")) {
                 orderValues.put(LikeWorkContract.OrderEntry.COLUMN_CAR_ID, Car(attr));
             }
             else if(attr.getNodeName().equalsIgnoreCase("m:customer")) {
                 orderValues.put(LikeWorkContract.OrderEntry.COLUMN_CUSTOMER_ID, Client(attr));
             }
-            else if(attr.getNodeName().equalsIgnoreCase("m:client")) {
+            else if (attr.getNodeName().equalsIgnoreCase("m:client")) {
                 orderValues.put(LikeWorkContract.OrderEntry.COLUMN_CLIENT_ID, Client(attr));
             }
             else if(attr.getNodeName().equalsIgnoreCase("m:status")) {
@@ -365,12 +415,12 @@ public class Exchange1C {
                 recordValues.put(LikeWorkContract.RecordEntry.COLUMN_CLIENT_ID, Client(attr));
             }
             else if(attr.getNodeName().equalsIgnoreCase("m:done")) {
-                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_DONE, (attr.getTextContent().equals("true")) ? 1 : 0);
+                recordValues.put(LikeWorkContract.RecordEntry.COLUMN_DONE, (attr.getTextContent().equals("1")) ? 1 : 0);
             }
         }
 
         String selection = LikeWorkContract.RecordEntry.TABLE_NAME + "." +
-                            LikeWorkContract.RecordEntry.COLUMN_ID_1C + " = ?";
+                LikeWorkContract.RecordEntry.COLUMN_ID_1C + " = ?";
         String[] selectionArgs = {recordID};
 
         String[] projection = {
@@ -443,6 +493,8 @@ public class Exchange1C {
                 CallValues.put(LikeWorkContract.CallEntry.COLUMN_INTERVIEW_ID, attr.getTextContent());
             }
         }
+
+        CallValues.put(LikeWorkContract.CallEntry.COLUMN_DONE, 0);
 
         String[] projection = {
                 LikeWorkContract.CallEntry.TABLE_NAME + "." + LikeWorkContract.CallEntry._ID,
@@ -703,6 +755,61 @@ public class Exchange1C {
         }
 
         return statusID;
+    }
+
+    private static void Question(Node questionNode) {
+
+        ContentValues newValues = new ContentValues();
+        NodeList attrs = questionNode.getChildNodes();
+        String questionID = "";
+
+        for (int i = 0; i < attrs.getLength(); i++) {
+            Node attr = attrs.item(i);
+            if (attr.getNodeName().equalsIgnoreCase("m:id")) {
+                newValues.put(LikeWorkContract.QuestionEntry.COLUMN_ID_1C, attr.getTextContent());
+                questionID = attr.getTextContent();
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:interview_ID")) {
+                newValues.put(LikeWorkContract.QuestionEntry.COLUMN_INTERVIEW_ID, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:name")) {
+                newValues.put(LikeWorkContract.QuestionEntry.COLUMN_NAME, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:text")) {
+                newValues.put(LikeWorkContract.QuestionEntry.COLUMN_SPEECH, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:options")) {
+                Element element = (Element) attrs.item(i);
+                NodeList options = element.getElementsByTagName("m:option");
+                for (int k=0;k<options.getLength();k++){
+                    Answer(options.item(k), questionID);
+                }
+            }
+        }
+
+        mContext.getContentResolver().insert(LikeWorkContract.QuestionEntry.CONTENT_URI, newValues);
+
+    }
+
+    private static void Answer(Node answerNode, String questionID) {
+
+        ContentValues newValues = new ContentValues();
+        NodeList attrs = answerNode.getChildNodes();
+
+        for (int i = 0; i < attrs.getLength(); i++) {
+            Node attr = attrs.item(i);
+            if (attr.getNodeName().equalsIgnoreCase("m:id")) {
+                newValues.put(LikeWorkContract.AnswerEntry.COLUMN_ID_1C, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:name")) {
+                newValues.put(LikeWorkContract.AnswerEntry.COLUMN_NAME, attr.getTextContent());
+            }
+        }
+
+        newValues.put(LikeWorkContract.AnswerEntry.COLUMN_QUESTION_ID, questionID);
+
+        mContext.getContentResolver().insert(LikeWorkContract.AnswerEntry.CONTENT_URI, newValues);
+
     }
 
     private static boolean dataChanged(Cursor valueCursor, ContentValues expectedValues) {

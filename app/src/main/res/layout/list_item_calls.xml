@@ -34,22 +34,50 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/list_item_call_client"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Цыбина Елена Владимировна"
-        style="@style/TextAppearance.AppCompat.Body1"
-        android:ellipsize="end"
-        android:singleLine="true" />
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/list_item_call_detail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="ТО - 20 000 км"
-        style="@style/TextAppearance.AppCompat.Caption"
-        android:ellipsize="end"
-        android:singleLine="true" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="15">
+
+            <TextView
+                android:id="@+id/list_item_call_client"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Цыбина Елена Владимировна"
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:ellipsize="end"
+                android:singleLine="true" />
+
+            <TextView
+                android:id="@+id/list_item_call_detail"
+                android:layout_height="wrap_content"
+                android:text="ТО - 20 000 км"
+                style="@style/TextAppearance.AppCompat.Caption"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:layout_width="wrap_content" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="bottom">
+
+            <ImageView
+                android:id="@+id/list_item_call_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </FrameLayout>
+
+    </LinearLayout>
 
 </LinearLayout>
