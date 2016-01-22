@@ -18,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -65,6 +66,7 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
     private TextView mCommentView;
     private TextView mTypeView;
     private TextView mSumView;
+    private EditText mEditComment;
     private LinearLayout mContainer;
     private View mQuestion;
     private ArrayList<View> qList;
@@ -86,7 +88,6 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
 
                 Boolean errors = false;
                 for (View v:qList) {
-                    TextView qHeader= (TextView) v.findViewById(R.id.question_header);
                     TextView qAnswer = (TextView) v.findViewById(R.id.question_answer);
                     if (qAnswer.getTag() == null) {
                         errors = true;
@@ -106,7 +107,7 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
                     newValues.put(LikeWorkContract.ReplyEntry.COLUMN_INTERVIEW_ID, mInterviewID);
                     newValues.put(LikeWorkContract.ReplyEntry.COLUMN_QUESTION_ID, (String) v.getTag());
                     newValues.put(LikeWorkContract.ReplyEntry.COLUMN_ANSWER_ID, (String) qAnswer.getTag());
-                    newValues.put(LikeWorkContract.ReplyEntry.COLUMN_COMMENT, qAnswer.getText().toString());
+                    newValues.put(LikeWorkContract.ReplyEntry.COLUMN_COMMENT, (qList.indexOf(v) != 0) ? "":mEditComment.getText().toString());
 
                     getContext().getContentResolver().insert(LikeWorkContract.ReplyEntry.CONTENT_URI, newValues);
                 }
@@ -143,6 +144,7 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
         mCommentView = (TextView) rootView.findViewById(R.id.call_comment);
         mTypeView = (TextView) rootView.findViewById(R.id.call_type);
         mSumView = (TextView) rootView.findViewById(R.id.call_sum);
+        mEditComment = (EditText) rootView.findViewById(R.id.call_comment_input);
 
         mContainer = (LinearLayout) rootView.findViewById(R.id.questions_container);
 

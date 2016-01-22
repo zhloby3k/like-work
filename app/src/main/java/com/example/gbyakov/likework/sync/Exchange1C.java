@@ -21,6 +21,9 @@ import org.apache.http.impl.auth.NTLMSchemeFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -32,6 +35,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,10 +61,39 @@ public class Exchange1C {
         mContext    = context;
     }
 
-    private static String SendRequest(String method) {
+    private static String add_params(JSONObject object) {
+
+        String req = "";
+        try {
+            Iterator<String> keys = object.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                Object value = object.get(key);
+                if (value instanceof String) {
+                    req += "<"+key+">"+value.toString()+"</"+key+">";
+                } else if (value instanceof JSONObject) {
+                    req += "<" + key + ">";
+                    req += add_params(((JSONObject) value));
+                    req += "</" + key + ">";
+                } else if (value instanceof JSONArray) {
+                    for (int index = 0; index < ((JSONArray) value).length(); ++index) {
+                        req += "<" + key + ">";
+                        req += add_params(((JSONArray) value).getJSONObject(index));
+                        req += "</" + key + ">";
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            // Something went wrong!
+        }
+        return req;
+    }
+
+    private static String SendRequest(String method, String params) {
 
         String request = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Header/><soap:Body>";
         request += "<"+method+" xmlns=\"http://mobile.verra.ru\">";
+        request += params;
         request += "</"+method+">";
         request += "</soap:Body></soap:Envelope>";
 
@@ -115,7 +148,7 @@ public class Exchange1C {
 
         List<String> ids = new ArrayList<>();
 
-        String response = SendRequest("GetOrders");
+        String response = SendRequest("GetOrders", "");
         if (!response.equals("")){
             Log.d(LOG_TAG, "GetOrders - start");
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -147,7 +180,7 @@ public class Exchange1C {
 
         List<String> ids = new ArrayList<>();
 
-        String response = SendRequest("GetFollowups");
+        String response = SendRequest("GetFollowups", "");
         if (!response.equals("")){
             Log.d(LOG_TAG, "GetFollowUps - start");
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -180,7 +213,7 @@ public class Exchange1C {
 
         List<String> ids = new ArrayList<>();
 
-        String response = SendRequest("GetRecords");
+        String response = SendRequest("GetRecords", "");
         if (!response.equals("")){
             Log.d(LOG_TAG, "GetRecords - start");
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -211,7 +244,7 @@ public class Exchange1C {
 
     public void UpdateStates() {
 
-        String response = SendRequest("GetStates");
+        String response = SendRequest("GetStates", "");
         if (!response.equals("")){
             Log.d(LOG_TAG, "GetStates - start");
             mContext.getContentResolver().delete(LikeWorkContract.StateEntry.CONTENT_URI, null, null);
@@ -235,7 +268,7 @@ public class Exchange1C {
 
     public void UpdateParts() {
 
-        String response = SendRequest("GetParts");
+        String response = SendRequest("GetParts", "");
         if (!response.equals("")){
             Log.d(LOG_TAG, "GetParts - start");
             mContext.getContentResolver().delete(LikeWorkContract.PartEntry.CONTENT_URI, null, null);
@@ -259,7 +292,7 @@ public class Exchange1C {
 
     public void UpdateOperations() {
 
-        String response = SendRequest("GetOperations");
+        String response = SendRequest("GetOperations", "");
         if (!response.equals("")){
             Log.d(LOG_TAG, "GetOperations - start");
             mContext.getContentResolver().delete(LikeWorkContract.OperationEntry.CONTENT_URI, null, null);
@@ -281,9 +314,53 @@ public class Exchange1C {
 
     }
 
+    public void SendAnswers() {
+
+        Cursor cursor = mContext.getContentResolver().query(
+                LikeWorkContract.ReplyEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null,
+                null);
+
+        if (cursor != null && cursor.getCount() > 0) {
+
+            JSONObject jsonParams = new JSONObject();
+            JSONObject jsonAnswers = new JSONObject();
+            try {
+
+                JSONArray jsonAnswersArray = new JSONArray();
+                while (cursor.moveToNext()) {
+                    JSONObject jsonAnswer = new JSONObject();
+                    jsonAnswer.put("call_id",  cursor.getString(cursor.getColumnIndex(LikeWorkContract.ReplyEntry.COLUMN_CALL_ID)));
+                    jsonAnswer.put("interview_id", cursor.getString(cursor.getColumnIndex(LikeWorkContract.ReplyEntry.COLUMN_INTERVIEW_ID)));
+                    jsonAnswer.put("question_id", cursor.getString(cursor.getColumnIndex(LikeWorkContract.ReplyEntry.COLUMN_QUESTION_ID)));
+                    jsonAnswer.put("answer_id", cursor.getString(cursor.getColumnIndex(LikeWorkContract.ReplyEntry.COLUMN_ANSWER_ID)));
+                    jsonAnswer.put("comment", cursor.getString(cursor.getColumnIndex(LikeWorkContract.ReplyEntry.COLUMN_COMMENT)));
+                    jsonAnswersArray.put(jsonAnswer);
+                }
+                jsonAnswers.put("answer", jsonAnswersArray);
+                jsonParams.put("answers", jsonAnswers);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            String data = add_params(jsonParams);
+
+            String response = SendRequest("PutAnswers", data);
+            if (!response.equals("") && response.indexOf("true")>0) {
+                mContext.getContentResolver().delete(LikeWorkContract.ReplyEntry.CONTENT_URI, null, null);
+            }
+
+        }
+
+    }
+
     public void UpdateQuestions() {
 
-        String response = SendRequest("GetQuestions");
+        String response = SendRequest("GetQuestions", "");
         if (!response.equals("")){
             Log.d(LOG_TAG, "GetQuestions - start");
             mContext.getContentResolver().delete(LikeWorkContract.QuestionEntry.CONTENT_URI, null, null);
