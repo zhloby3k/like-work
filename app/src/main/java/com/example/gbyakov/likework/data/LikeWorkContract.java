@@ -376,6 +376,7 @@ public class LikeWorkContract {
         public static final String COLUMN_PERCENT       = "percent";
         public static final String COLUMN_TREND         = "trend";
         public static final String COLUMN_ORDER         = "ordernum";
+        public static final String COLUMN_ISPERCENT     = "ispercent";
 
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);

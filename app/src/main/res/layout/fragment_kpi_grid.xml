@@ -8,6 +8,7 @@
         android:id="@+id/kpi_gridView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="4dp"
         android:layout_gravity="center_horizontal"
         android:numColumns="2"
         android:choiceMode="none"

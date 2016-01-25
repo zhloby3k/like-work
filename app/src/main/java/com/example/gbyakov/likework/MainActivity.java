@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity
         CallsListFragment.OnItemSelectedListener{
 
     FragmentManager mFragmentManager;
-    FragmentTransaction mFragmentTransaction;
     ActionBarDrawerToggle mDrawerToggle;
 
     @Override
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity
             public void onBackStackChanged() {
                 if (getSupportActionBar() != null) {
                     int bseCount = getSupportFragmentManager().getBackStackEntryCount();
-                    if (bseCount>0) {
+                    if (bseCount > 0) {
                         mDrawerToggle.setDrawerIndicatorEnabled(false);
                         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                         mDrawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
@@ -75,6 +74,9 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         mFragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container, new KpiGridFragment()).commit();
+
     }
 
     @Override

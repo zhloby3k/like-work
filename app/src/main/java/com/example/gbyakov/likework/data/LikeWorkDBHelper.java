@@ -20,7 +20,7 @@ import com.example.gbyakov.likework.data.LikeWorkContract.StatusEntry;
 
 public class LikeWorkDBHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     static final String DATABASE_NAME = "likework.db";
 
@@ -157,7 +157,8 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
                 KpiEntry.COLUMN_VALUE + " REAL NOT NULL, " +
                 KpiEntry.COLUMN_PERCENT + " REAL, " +
                 KpiEntry.COLUMN_TREND + " REAL, " +
-                KpiEntry.COLUMN_ORDER + " INTEGER NOT NULL " +
+                KpiEntry.COLUMN_ORDER + " INTEGER NOT NULL, " +
+                KpiEntry.COLUMN_ISPERCENT + " INTEGER NOT NULL " +
                 " );";
 
         db.execSQL(SQL_CREATE_ORDER_TABLE);

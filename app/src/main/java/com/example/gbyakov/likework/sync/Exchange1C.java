@@ -930,6 +930,8 @@ public class Exchange1C {
             } else if (attr.getNodeName().equalsIgnoreCase("m:order")) {
                 newValues.put(LikeWorkContract.KpiEntry.COLUMN_ORDER, Integer.decode(attr.getTextContent()));
                 numKPI = attr.getTextContent();
+            } else if (attr.getNodeName().equalsIgnoreCase("m:ispercent")) {
+                newValues.put(LikeWorkContract.KpiEntry.COLUMN_ISPERCENT, (attr.getTextContent().toString().equals("true")) ? 1:0);
             }
         }
 
