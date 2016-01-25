@@ -23,6 +23,7 @@ public class LikeWorkContract {
     public static final String PATH_QUESTION    = "question";
     public static final String PATH_ANSWER  = "answer";
     public static final String PATH_REPLY   = "reply";
+    public static final String PATH_KPI     = "kpi";
 
     public static final class OrderEntry implements BaseColumns {
 
@@ -354,6 +355,27 @@ public class LikeWorkContract {
         public static final String COLUMN_QUESTION_ID   = "question_id";
         public static final String COLUMN_ANSWER_ID     = "answer_id";
         public static final String COLUMN_COMMENT       = "comment";
+
+        public static Uri buildUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
+    public static final class KpiEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_KPI).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_KPI;
+
+        public static final String TABLE_NAME           = "kpi";
+
+        public static final String COLUMN_NAME          = "name";
+        public static final String COLUMN_VALUE         = "value";
+        public static final String COLUMN_PERCENT       = "percent";
+        public static final String COLUMN_TREND         = "trend";
+        public static final String COLUMN_ORDER         = "ordernum";
 
         public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
