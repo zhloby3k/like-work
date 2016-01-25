@@ -9,6 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:numColumns="2" />
+        android:numColumns="2"
+        android:choiceMode="none"
+        android:listSelector="#00000000" />
 
 </LinearLayout>

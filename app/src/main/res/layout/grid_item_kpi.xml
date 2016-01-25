@@ -11,10 +11,10 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="4dp"
         card_view:cardCornerRadius="4dp"
-        card_view:cardElevation="2dp">
+        card_view:cardElevation="3dp">
 
         <LinearLayout
             android:orientation="vertical"
@@ -31,7 +31,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Выручка"
-                style="@style/TextAppearance.AppCompat.Subhead" />
+                style="@style/TextAppearance.AppCompat.Body2"
+                android:textColor="@color/ColorTabs"
+                android:singleLine="true" />
 
             <TextView
                 android:id="@+id/kpi_value"
@@ -40,18 +42,19 @@
                 android:paddingBottom="8dp"
                 android:paddingTop="8dp"
                 android:text="1 125 000"
-                style="@style/TextAppearance.AppCompat.Headline"
-                android:gravity="center_horizontal" />
+                style="@style/TextAppearance.AppCompat.Title"
+                android:gravity="center_horizontal"
+                android:textColor="@color/colorAccent" />
 
             <TextView
                 android:id="@+id/kpi_percent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="8dp"
-                android:paddingTop="8dp"
+                android:paddingBottom="4dp"
                 android:text="35 %"
-                style="@style/TextAppearance.AppCompat.Headline"
-                android:gravity="center_horizontal" />
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:gravity="right"
+                android:textColor="@color/colorPrimaryDark" />
 
         </LinearLayout>
 

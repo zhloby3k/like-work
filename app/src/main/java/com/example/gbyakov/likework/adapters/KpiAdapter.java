@@ -59,9 +59,12 @@ public class KpiAdapter extends CursorAdapter {
         viewHolder.valueView.setText(myFormatter.format(value));
 
         double percent = cursor.getDouble(cursor.getColumnIndex(LikeWorkContract.KpiEntry.COLUMN_PERCENT));
-        myFormatter = new DecimalFormat("##0.00", unusualSymbols);
+        myFormatter = new DecimalFormat("##0", unusualSymbols);
         myFormatter.setGroupingSize(3);
-        viewHolder.percentView.setText(myFormatter.format(value));
+        if (value == 0 && percent > 0) {
+            viewHolder.valueView.setText(myFormatter.format(percent)+" %");
+            viewHolder.percentView.setText("");
+        } else viewHolder.percentView.setText(myFormatter.format(percent)+" %");
 
     }
 }
