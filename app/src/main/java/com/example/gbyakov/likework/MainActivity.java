@@ -16,6 +16,7 @@ import android.view.View;
 import com.example.gbyakov.likework.data.LikeWorkContract;
 import com.example.gbyakov.likework.fragments.CallItemFragment;
 import com.example.gbyakov.likework.fragments.CallsListFragment;
+import com.example.gbyakov.likework.fragments.KpiGridFragment;
 import com.example.gbyakov.likework.fragments.OrderItemFragment;
 import com.example.gbyakov.likework.fragments.OrdersListFragment;
 import com.example.gbyakov.likework.fragments.RecordItemFragment;
@@ -92,6 +93,9 @@ public class MainActivity extends AppCompatActivity
         int bseCount = mFragmentManager.getBackStackEntryCount();
 
         if (id == R.id.nav_kpi) {
+            if (bseCount>0) mFragmentManager.popBackStack();
+            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.container, new KpiGridFragment()).commit();
             LikeWorkSyncAdapter.syncImmediately(this);
         } else if (id == R.id.nav_records) {
             if (bseCount>0) mFragmentManager.popBackStack();
