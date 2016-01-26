@@ -307,7 +307,7 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
                 fabCall.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(Intent.ACTION_CALL);
+                        Intent intent = new Intent(Intent.ACTION_DIAL);
                         intent.setData(Uri.parse("tel:" + v.getTag().toString()));
                         startActivity(intent);
                     }
