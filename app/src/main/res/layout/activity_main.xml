@@ -43,24 +43,6 @@
             fab:menu_colorNormal="@color/colorAccent"
             fab:menu_icon="@drawable/ic_call">
 
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/menu_item1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_phone_in_talk"
-                app:fab_colorNormal="@color/colorAccent"
-                fab:fab_size="mini"
-                fab:fab_label="Menu item 1" />
-
-            <com.github.clans.fab.FloatingActionButton
-                android:id="@+id/menu_item2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_phone_in_talk"
-                app:fab_colorNormal="@color/colorAccent"
-                fab:fab_size="mini"
-                fab:fab_label="Menu item 2" />
-
         </com.github.clans.fab.FloatingActionMenu>
 
     </android.support.design.widget.CoordinatorLayout>

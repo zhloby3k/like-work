@@ -209,6 +209,30 @@ public class Exchange1C {
 
     }
 
+    public void UpdatePhones() {
+
+        String response = SendRequest("GetPhones", "");
+        if (!response.equals("")){
+            Log.d(LOG_TAG, "GetPhones - start");
+            mContext.getContentResolver().delete(LikeWorkContract.PhoneEntry.CONTENT_URI, null, null);
+            Log.d(LOG_TAG, "GetPhones - trancate table");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            try {
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document dom = builder.parse(new ByteArrayInputStream(response.getBytes()));
+                Element root = dom.getDocumentElement();
+                NodeList items = root.getElementsByTagName("m:phone");
+                for (int i=0;i<items.getLength();i++){
+                    Phone(items.item(i));
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            Log.d(LOG_TAG, "GetPhones - finish");
+        }
+
+    }
+
     public void UpdateRecords() {
 
         List<String> ids = new ArrayList<>();
@@ -628,6 +652,30 @@ public class Exchange1C {
         }
 
         return callID;
+    }
+
+    private static void Phone(Node node) throws ParseException {
+
+        ContentValues newValues = new ContentValues();
+        NodeList attrs = node.getChildNodes();
+
+        for (int i = 0; i < attrs.getLength(); i++) {
+            Node attr = attrs.item(i);
+            if (attr.getNodeName().equalsIgnoreCase("m:client_id")) {
+                newValues.put(LikeWorkContract.PhoneEntry.COLUMN_CLIENT_ID, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:name")) {
+                newValues.put(LikeWorkContract.PhoneEntry.COLUMN_NAME, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:descr")) {
+                newValues.put(LikeWorkContract.PhoneEntry.COLUMN_DESCR, attr.getTextContent());
+            }
+            else if(attr.getNodeName().equalsIgnoreCase("m:number")) {
+                newValues.put(LikeWorkContract.PhoneEntry.COLUMN_PHONE, attr.getTextContent());
+            }
+        }
+
+        mContext.getContentResolver().insert(LikeWorkContract.PhoneEntry.CONTENT_URI, newValues);
     }
 
     private static void State(Node node) throws ParseException {

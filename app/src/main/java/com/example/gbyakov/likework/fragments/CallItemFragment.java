@@ -204,7 +204,7 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
         } else if ( id == PHONES_LOADER ) {
             return new CursorLoader(
                     getActivity(),
-                    LikeWorkContract.AnswerEntry.buildQuestionUri(mClientID),
+                    LikeWorkContract.PhoneEntry.buildClientUri(mClientID),
                     null,
                     null,
                     null,
@@ -245,7 +245,7 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
             mInterviewID = data.getString(data.getColumnIndex(LikeWorkContract.CallEntry.COLUMN_INTERVIEW_ID));
             mClientID = data.getString(data.getColumnIndex("ClientID"));
 
-            getLoaderManager().initLoader(PHONES_LOADER, null, this);
+            getLoaderManager().restartLoader(PHONES_LOADER, null, this);
 
         } else if (loader.getId() == QUESTIONS_LOADER && data != null) {
 
@@ -289,7 +289,7 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
         } else if (loader.getId() == PHONES_LOADER && data != null) {
 
             FloatingActionMenu fabMenu = ((MainActivity) getActivity()).fabMenu;
-            //fabMenu.removeAllMenuButtons();
+            fabMenu.removeAllMenuButtons();
 
             while (data.moveToNext()) {
 
@@ -340,15 +340,17 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
         Cursor cursor = ((SimpleCursorAdapter) lv.getAdapter()).getCursor();
         cursor.moveToPosition(which);
 
+        if (qAnswer.getTag() == null) {
+            ImageView image = (ImageView) mQuestion.findViewById(R.id.question_logo);
+            TransitionDrawable drawable = (TransitionDrawable) image.getDrawable();
+            drawable.setCrossFadeEnabled(true);
+            drawable.startTransition(500);
+        }
+
         String aName = cursor.getString(cursor.getColumnIndex(LikeWorkContract.AnswerEntry.COLUMN_NAME));
         String aID   = cursor.getString(cursor.getColumnIndex(LikeWorkContract.AnswerEntry.COLUMN_ID_1C));
         qAnswer.setText(aName);
         qAnswer.setTag(aID);
-
-        ImageView image = (ImageView) mQuestion.findViewById(R.id.question_logo);
-        TransitionDrawable drawable = (TransitionDrawable) image.getDrawable();
-        drawable.setCrossFadeEnabled(true);
-        drawable.startTransition(500);
 
     }
 }
