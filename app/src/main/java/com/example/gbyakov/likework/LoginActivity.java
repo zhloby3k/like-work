@@ -21,6 +21,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.gbyakov.likework.sync.LikeWorkSyncAdapter;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
@@ -114,7 +116,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
             focusView.requestFocus();
         } else {
             showProgress(true);
-            mAuthTask = new UserLoginTask(username, password, domain);
+            mAuthTask = new UserLoginTask(this, username, password, domain);
             mAuthTask.execute((Void) null);
         }
     }
@@ -154,8 +156,10 @@ public class LoginActivity extends AccountAuthenticatorActivity {
         private final String mDomain;
         private final String mPassword;
         private Integer mStatusCode;
+        private Context mContext;
 
-        UserLoginTask(String username, String password, String domain) {
+        UserLoginTask(Context context, String username, String password, String domain) {
+            mContext    = context;
             mUserName   = username;
             mPassword   = password;
             mDomain     = domain;
@@ -189,6 +193,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
                     Account acc = new Account((mDomain.equals("") ? mUserName : mDomain+"\\"+mUserName),
                             LoginActivity.this.AUTHTOKEN_TYPE);
                     am.addAccountExplicitly(acc, mPassword, null);
+                    LikeWorkSyncAdapter.initializeSyncAdapter(mContext);
                 }
 
                 return (mStatusCode == 200);

@@ -27,7 +27,6 @@ import com.example.gbyakov.likework.fragments.OrdersListFragment;
 import com.example.gbyakov.likework.fragments.RecordItemFragment;
 import com.example.gbyakov.likework.fragments.RecordsListFragment;
 import com.example.gbyakov.likework.fragments.RecordsTabFragment;
-import com.example.gbyakov.likework.sync.LikeWorkSyncAdapter;
 import com.github.clans.fab.FloatingActionMenu;
 
 public class MainActivity extends AppCompatActivity
@@ -111,7 +110,6 @@ public class MainActivity extends AppCompatActivity
             if (bseCount>0) mFragmentManager.popBackStack();
             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.container, new KpiGridFragment()).commit();
-            LikeWorkSyncAdapter.syncImmediately(this);
         } else if (id == R.id.nav_records) {
             if (bseCount>0) mFragmentManager.popBackStack();
             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
