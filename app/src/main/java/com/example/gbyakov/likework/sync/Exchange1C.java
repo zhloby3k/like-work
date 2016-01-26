@@ -20,6 +20,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.NTLMSchemeFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -125,7 +126,7 @@ public class Exchange1C {
 
             HttpPost httpPost = new HttpPost(mContext.getString(R.string.ws_link));
 
-            StringEntity sEntity = new StringEntity(request);
+            StringEntity sEntity = new StringEntity(request, HTTP.UTF_8);
             sEntity.setContentType("text/xml");
             httpPost.setEntity(sEntity);
             HttpResponse response = httpclient.execute(httpPost);
