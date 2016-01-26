@@ -16,6 +16,7 @@ import android.view.View;
 import com.example.gbyakov.likework.data.LikeWorkContract;
 import com.example.gbyakov.likework.fragments.CallItemFragment;
 import com.example.gbyakov.likework.fragments.CallsListFragment;
+import com.example.gbyakov.likework.fragments.KpiGridFragment;
 import com.example.gbyakov.likework.fragments.OrderItemFragment;
 import com.example.gbyakov.likework.fragments.OrdersListFragment;
 import com.example.gbyakov.likework.fragments.RecordItemFragment;
@@ -30,7 +31,6 @@ public class MainActivity extends AppCompatActivity
         CallsListFragment.OnItemSelectedListener{
 
     FragmentManager mFragmentManager;
-    FragmentTransaction mFragmentTransaction;
     ActionBarDrawerToggle mDrawerToggle;
 
     @Override
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity
             public void onBackStackChanged() {
                 if (getSupportActionBar() != null) {
                     int bseCount = getSupportFragmentManager().getBackStackEntryCount();
-                    if (bseCount>0) {
+                    if (bseCount > 0) {
                         mDrawerToggle.setDrawerIndicatorEnabled(false);
                         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                         mDrawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
@@ -74,6 +74,9 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         mFragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container, new KpiGridFragment()).commit();
+
     }
 
     @Override
@@ -92,6 +95,9 @@ public class MainActivity extends AppCompatActivity
         int bseCount = mFragmentManager.getBackStackEntryCount();
 
         if (id == R.id.nav_kpi) {
+            if (bseCount>0) mFragmentManager.popBackStack();
+            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.container, new KpiGridFragment()).commit();
             LikeWorkSyncAdapter.syncImmediately(this);
         } else if (id == R.id.nav_records) {
             if (bseCount>0) mFragmentManager.popBackStack();

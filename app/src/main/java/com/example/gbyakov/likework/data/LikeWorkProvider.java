@@ -12,6 +12,7 @@ import com.example.gbyakov.likework.data.LikeWorkContract.AnswerEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.CallEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.CarEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.ClientEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.KpiEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.OperationEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.OrderEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.PartEntry;
@@ -36,6 +37,7 @@ public class LikeWorkProvider extends ContentProvider {
     static final int RECORD_DATES       = 210;
     static final int CALL               = 300;
     static final int CALL_ID            = 301;
+    static final int KPI                = 500;
 
     static final int STATE              = 400;
     static final int STATE_OF_DOC       = 401;
@@ -66,6 +68,7 @@ public class LikeWorkProvider extends ContentProvider {
         matcher.addURI(authority, LikeWorkContract.PATH_RECORD + "/#",          RECORD_ID);
         matcher.addURI(authority, LikeWorkContract.PATH_CALL,                   CALL);
         matcher.addURI(authority, LikeWorkContract.PATH_CALL + "/#",            CALL_ID);
+        matcher.addURI(authority, LikeWorkContract.PATH_KPI,                    KPI);
 
         matcher.addURI(authority, LikeWorkContract.PATH_STATE,                  STATE);
         matcher.addURI(authority, LikeWorkContract.PATH_STATE + "/*",           STATE_OF_DOC);
@@ -495,6 +498,18 @@ public class LikeWorkProvider extends ContentProvider {
                 );
                 break;
             }
+            case KPI: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        KpiEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -530,15 +545,17 @@ public class LikeWorkProvider extends ContentProvider {
             case STATE:
                 return StateEntry.CONTENT_TYPE;
             case PART:
-                return ClientEntry.CONTENT_TYPE;
+                return PartEntry.CONTENT_TYPE;
             case OPERATION:
-                return StatusEntry.CONTENT_TYPE;
+                return OperationEntry.CONTENT_TYPE;
             case QUESTION:
-                return ClientEntry.CONTENT_TYPE;
+                return QuestionEntry.CONTENT_TYPE;
             case ANSWER:
-                return StatusEntry.CONTENT_TYPE;
+                return AnswerEntry.CONTENT_TYPE;
             case REPLY:
                 return ReplyEntry.CONTENT_TYPE;
+            case KPI:
+                return KpiEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -649,6 +666,14 @@ public class LikeWorkProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
+            case KPI: {
+                long _id = db.insert(KpiEntry.TABLE_NAME, null, values);
+                if ( _id > 0 )
+                    returnUri = KpiEntry.buildUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -700,6 +725,9 @@ public class LikeWorkProvider extends ContentProvider {
                 break;
             case REPLY:
                 rowsDeleted = db.delete(ReplyEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case KPI:
+                rowsDeleted = db.delete(KpiEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -765,6 +793,10 @@ public class LikeWorkProvider extends ContentProvider {
                 break;
             case REPLY:
                 rowsUpdated = db.update(ReplyEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+            case KPI:
+                rowsUpdated = db.update(KpiEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
             default:

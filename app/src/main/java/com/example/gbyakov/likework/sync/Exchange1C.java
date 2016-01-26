@@ -383,6 +383,28 @@ public class Exchange1C {
 
     }
 
+    public void UpdateKpi() {
+
+        String response = SendRequest("GetKPI", "");
+        if (!response.equals("")){
+            Log.d(LOG_TAG, "GetKPI - start");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            try {
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document dom = builder.parse(new ByteArrayInputStream(response.getBytes()));
+                Element root = dom.getDocumentElement();
+                NodeList items = root.getElementsByTagName("m:perfindicator");
+                for (int i=0;i<items.getLength();i++){
+                    KPI(items.item(i));
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            Log.d(LOG_TAG, "GetKPI - finish");
+        }
+
+    }
+
     private static String Order(Node orderNode) throws ParseException {
 
         ContentValues orderValues = new ContentValues();
@@ -886,6 +908,51 @@ public class Exchange1C {
         newValues.put(LikeWorkContract.AnswerEntry.COLUMN_QUESTION_ID, questionID);
 
         mContext.getContentResolver().insert(LikeWorkContract.AnswerEntry.CONTENT_URI, newValues);
+
+    }
+
+    private static void KPI(Node kpiNode) {
+
+        ContentValues newValues = new ContentValues();
+        NodeList attrs = kpiNode.getChildNodes();
+        String numKPI = "";
+
+        for (int i = 0; i < attrs.getLength(); i++) {
+            Node attr = attrs.item(i);
+            if (attr.getNodeName().equalsIgnoreCase("m:name")) {
+                newValues.put(LikeWorkContract.KpiEntry.COLUMN_NAME, attr.getTextContent());
+            } else if (attr.getNodeName().equalsIgnoreCase("m:value")) {
+                newValues.put(LikeWorkContract.KpiEntry.COLUMN_VALUE, Double.parseDouble(attr.getTextContent()));
+            } else if (attr.getNodeName().equalsIgnoreCase("m:percent")) {
+                newValues.put(LikeWorkContract.KpiEntry.COLUMN_PERCENT, Double.parseDouble(attr.getTextContent()));
+            } else if (attr.getNodeName().equalsIgnoreCase("m:trend")) {
+                newValues.put(LikeWorkContract.KpiEntry.COLUMN_TREND, Double.parseDouble(attr.getTextContent()));
+            } else if (attr.getNodeName().equalsIgnoreCase("m:order")) {
+                newValues.put(LikeWorkContract.KpiEntry.COLUMN_ORDER, Integer.decode(attr.getTextContent()));
+                numKPI = attr.getTextContent();
+            } else if (attr.getNodeName().equalsIgnoreCase("m:ispercent")) {
+                newValues.put(LikeWorkContract.KpiEntry.COLUMN_ISPERCENT, (attr.getTextContent().toString().equals("true")) ? 1:0);
+            }
+        }
+
+        String selection = LikeWorkContract.KpiEntry.COLUMN_ORDER + " = ?";
+        String[] selectionArgs = {numKPI};
+
+        Cursor cursor = mContext.getContentResolver().query(
+                LikeWorkContract.KpiEntry.CONTENT_URI,
+                null,
+                selection,
+                selectionArgs,
+                null,
+                null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            if (dataChanged(cursor, newValues)) {
+                mContext.getContentResolver().update(LikeWorkContract.KpiEntry.CONTENT_URI, newValues, selection, selectionArgs);
+            }
+        } else {
+            mContext.getContentResolver().insert(LikeWorkContract.KpiEntry.CONTENT_URI, newValues);
+        }
 
     }
 
