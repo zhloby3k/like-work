@@ -24,6 +24,7 @@ public class LikeWorkContract {
     public static final String PATH_ANSWER  = "answer";
     public static final String PATH_REPLY   = "reply";
     public static final String PATH_KPI     = "kpi";
+    public static final String PATH_PHONE   = "phone";
 
     public static final class OrderEntry implements BaseColumns {
 
@@ -383,4 +384,31 @@ public class LikeWorkContract {
         }
     }
 
+    public static final class PhoneEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_PHONE).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PHONE;
+
+        public static final String TABLE_NAME           = "phones";
+
+        public static final String COLUMN_CLIENT_ID     = "client_id";
+        public static final String COLUMN_NAME          = "name";
+        public static final String COLUMN_DESCR         = "descr";
+        public static final String COLUMN_PHONE         = "phone";
+
+        public static Uri buildUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildClientUri(String ClientID) {
+            return CONTENT_URI.buildUpon().appendPath(ClientID).build();
+        }
+
+        public static String getClientFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+    }
 }
