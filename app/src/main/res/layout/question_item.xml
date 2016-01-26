@@ -59,7 +59,7 @@
                     android:layout_height="wrap_content"
                     android:text="Нет"
                     style="@style/TextAppearance.AppCompat.Body1"
-                    android:textColor="@color/colorAccent"
+                    android:textColor="#2e7d32"
                     android:textStyle="bold" />
 
             </LinearLayout>

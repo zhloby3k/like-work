@@ -12,6 +12,7 @@ import com.example.gbyakov.likework.data.LikeWorkContract.KpiEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.OperationEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.OrderEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.PartEntry;
+import com.example.gbyakov.likework.data.LikeWorkContract.PhoneEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.QuestionEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.RecordEntry;
 import com.example.gbyakov.likework.data.LikeWorkContract.ReplyEntry;
@@ -20,7 +21,7 @@ import com.example.gbyakov.likework.data.LikeWorkContract.StatusEntry;
 
 public class LikeWorkDBHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
 
     static final String DATABASE_NAME = "likework.db";
 
@@ -161,6 +162,14 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
                 KpiEntry.COLUMN_ISPERCENT + " INTEGER NOT NULL " +
                 " );";
 
+        final String SQL_CREATE_PHONE_TABLE = "CREATE TABLE " + PhoneEntry.TABLE_NAME + " (" +
+                PhoneEntry._ID + " INTEGER PRIMARY KEY," +
+                PhoneEntry.COLUMN_CLIENT_ID + " TEXT NOT NULL, " +
+                PhoneEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+                PhoneEntry.COLUMN_DESCR + " TEXT NOT NULL, " +
+                PhoneEntry.COLUMN_PHONE + " TEXT NOT NULL " +
+                " );";
+
         db.execSQL(SQL_CREATE_ORDER_TABLE);
         db.execSQL(SQL_CREATE_RECORD_TABLE);
         db.execSQL(SQL_CREATE_CALL_TABLE);
@@ -174,6 +183,7 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_ANSWER_TABLE);
         db.execSQL(SQL_CREATE_REPLY_TABLE);
         db.execSQL(SQL_CREATE_KPI_TABLE);
+        db.execSQL(SQL_CREATE_PHONE_TABLE);
 
     }
 
@@ -193,6 +203,7 @@ public class LikeWorkDBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + AnswerEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ReplyEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + KpiEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + PhoneEntry.TABLE_NAME);
         onCreate(db);
 
     }

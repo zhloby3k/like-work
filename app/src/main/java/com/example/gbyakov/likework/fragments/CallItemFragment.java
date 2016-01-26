@@ -3,6 +3,7 @@ package com.example.gbyakov.likework.fragments;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
@@ -26,8 +27,11 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.gbyakov.likework.MainActivity;
 import com.example.gbyakov.likework.R;
 import com.example.gbyakov.likework.data.LikeWorkContract;
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -41,6 +45,7 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
     private static final int CALL_LOADER = 0;
     private static final int QUESTIONS_LOADER = 1;
     private static final int ANSWERS_LOADER = 2;
+    private static final int PHONES_LOADER = 3;
 
     private static final String[] CALL_COLUMNS = {
             LikeWorkContract.CallEntry.TABLE_NAME + "." + LikeWorkContract.CallEntry._ID,
@@ -51,6 +56,7 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
             LikeWorkContract.CallEntry.COLUMN_TYPE,
             LikeWorkContract.CallEntry.COLUMN_INTERVIEW_ID,
             "Client."+LikeWorkContract.ClientEntry.COLUMN_NAME + " ClientName",
+            "Client."+LikeWorkContract.ClientEntry.COLUMN_ID_1C + " ClientID",
             LikeWorkContract.CarEntry.COLUMN_BRAND,
             LikeWorkContract.CarEntry.COLUMN_MODEL,
             LikeWorkContract.CarEntry.COLUMN_REGNUMBER,
@@ -74,6 +80,7 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
     private Uri mUri;
     private String mCallID;
     private String mInterviewID;
+    private String mClientID;
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -148,6 +155,9 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
 
         mContainer = (LinearLayout) rootView.findViewById(R.id.questions_container);
 
+        android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if (actionBar != null) actionBar.setTitle("Звонок заботы");
+
         return rootView;
     }
 
@@ -191,6 +201,15 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
                     null,
                     null
             );
+        } else if ( id == PHONES_LOADER ) {
+            return new CursorLoader(
+                    getActivity(),
+                    LikeWorkContract.PhoneEntry.buildClientUri(mClientID),
+                    null,
+                    null,
+                    null,
+                    null
+            );
         }
         return null;
     }
@@ -224,9 +243,9 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
 
             mCallID = data.getString(data.getColumnIndex(LikeWorkContract.CallEntry.COLUMN_ID_1C));
             mInterviewID = data.getString(data.getColumnIndex(LikeWorkContract.CallEntry.COLUMN_INTERVIEW_ID));
+            mClientID = data.getString(data.getColumnIndex("ClientID"));
 
-            android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-            if (actionBar != null) actionBar.setTitle("Звонок заботы");
+            getLoaderManager().restartLoader(PHONES_LOADER, null, this);
 
         } else if (loader.getId() == QUESTIONS_LOADER && data != null) {
 
@@ -267,6 +286,34 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
             AlertDialog dialog = builder.create();
             dialog.show();
 
+        } else if (loader.getId() == PHONES_LOADER && data != null) {
+
+            FloatingActionMenu fabMenu = ((MainActivity) getActivity()).fabMenu;
+            fabMenu.removeAllMenuButtons();
+
+            while (data.moveToNext()) {
+
+                String pName    = data.getString(data.getColumnIndex(LikeWorkContract.PhoneEntry.COLUMN_NAME));
+                String pDescr   = data.getString(data.getColumnIndex(LikeWorkContract.PhoneEntry.COLUMN_DESCR));
+                String pNumber  = data.getString(data.getColumnIndex(LikeWorkContract.PhoneEntry.COLUMN_PHONE));
+
+                FloatingActionButton fabCall = new FloatingActionButton(getActivity());
+                fabCall.setButtonSize(FloatingActionButton.SIZE_MINI);
+                fabCall.setLabelText(pName + ": " + pDescr);
+                fabCall.setImageResource(R.drawable.ic_phone_in_talk);
+                fabCall.setColorNormal(getResources().getColor(R.color.colorAccent));
+                fabCall.setTag(pNumber);
+                fabMenu.addMenuButton(fabCall);
+                fabCall.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_DIAL);
+                        intent.setData(Uri.parse("tel:" + v.getTag().toString()));
+                        startActivity(intent);
+                    }
+                });
+
+            }
         }
 
     }
@@ -293,15 +340,17 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
         Cursor cursor = ((SimpleCursorAdapter) lv.getAdapter()).getCursor();
         cursor.moveToPosition(which);
 
+        if (qAnswer.getTag() == null) {
+            ImageView image = (ImageView) mQuestion.findViewById(R.id.question_logo);
+            TransitionDrawable drawable = (TransitionDrawable) image.getDrawable();
+            drawable.setCrossFadeEnabled(true);
+            drawable.startTransition(500);
+        }
+
         String aName = cursor.getString(cursor.getColumnIndex(LikeWorkContract.AnswerEntry.COLUMN_NAME));
         String aID   = cursor.getString(cursor.getColumnIndex(LikeWorkContract.AnswerEntry.COLUMN_ID_1C));
         qAnswer.setText(aName);
         qAnswer.setTag(aID);
-
-        ImageView image = (ImageView) mQuestion.findViewById(R.id.question_logo);
-        TransitionDrawable drawable = (TransitionDrawable) image.getDrawable();
-        drawable.setCrossFadeEnabled(true);
-        drawable.startTransition(500);
 
     }
 }

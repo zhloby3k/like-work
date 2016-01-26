@@ -39,8 +39,9 @@ public class LikeWorkSyncAdapter extends AbstractThreadedSyncAdapter {
         Exchange1C mExchange = new Exchange1C(username, domain, password, getContext());
         mExchange.SendAnswers();
         mExchange.UpdateOrders();
-        mExchange.UpdateCalls();
         mExchange.UpdateRecords();
+        mExchange.UpdateCalls();
+        mExchange.UpdatePhones();
         mExchange.UpdateStates();
         mExchange.UpdateParts();
         mExchange.UpdateOperations();
