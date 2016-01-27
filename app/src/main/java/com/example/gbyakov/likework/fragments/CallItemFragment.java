@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -154,6 +155,11 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
         mEditComment = (EditText) rootView.findViewById(R.id.call_comment_input);
 
         mContainer = (LinearLayout) rootView.findViewById(R.id.questions_container);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            View headShadow = rootView.findViewById(R.id.callhead_shadow);
+            headShadow.setVisibility(View.GONE);
+        }
 
         android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         if (actionBar != null) actionBar.setTitle("Звонок заботы");

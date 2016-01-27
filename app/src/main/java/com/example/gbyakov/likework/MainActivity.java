@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
@@ -88,6 +89,10 @@ public class MainActivity extends AppCompatActivity
         fabMenu = (FloatingActionMenu) findViewById(R.id.fab_menu);
         fabMenu.hideMenuButton(false);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            View toolbarShadow = findViewById(R.id.toolbar_shadow);
+            toolbarShadow.setVisibility(View.GONE);
+        }
         createCustomAnimation();
     }
 
