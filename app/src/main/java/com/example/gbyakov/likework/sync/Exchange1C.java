@@ -12,14 +12,14 @@ import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.NTLMSchemeFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.SingleClientConnManager;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
@@ -31,7 +31,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.net.URL;
+import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,8 +51,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -105,18 +116,20 @@ public class Exchange1C {
             URL url = new URL(mContext.getString(R.string.ws_link));
             if ("https".equals(url.getProtocol())) {
 
-                HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+                KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                trustStore.load(null, null);
+
+                SSLSocketFactory socketFactory = new MySSLSocketFactory(trustStore);
+                socketFactory.setHostnameVerifier(
+                        SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 
                 DefaultHttpClient client = new DefaultHttpClient();
 
                 SchemeRegistry registry = new SchemeRegistry();
-                SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
-                socketFactory.setHostnameVerifier((X509HostnameVerifier) hostnameVerifier);
                 registry.register(new Scheme("https", socketFactory, 443));
-                SingleClientConnManager mgr = new SingleClientConnManager(client.getParams(), registry);
-                httpclient = new DefaultHttpClient(mgr, client.getParams());
+                ClientConnectionManager ccm = new ThreadSafeClientConnManager(client.getParams(), registry);
+                httpclient = new DefaultHttpClient(ccm, client.getParams());
 
-                HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier);
             }
 
             httpclient.getAuthSchemes().register("ntlm", new NTLMSchemeFactory());
@@ -1015,5 +1028,44 @@ public class Exchange1C {
             if (!expectedValue.equals(valueCursor.getString(idx))) return true;
         }
         return false;
+    }
+
+    public static class MySSLSocketFactory extends SSLSocketFactory {
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+
+        public MySSLSocketFactory(KeyStore truststore)
+                throws NoSuchAlgorithmException, KeyManagementException,
+                KeyStoreException, UnrecoverableKeyException {
+            super(truststore);
+
+            TrustManager tm = new X509TrustManager() {
+                public void checkClientTrusted(X509Certificate[] chain,
+                                               String authType) throws CertificateException {
+                }
+
+                public void checkServerTrusted(X509Certificate[] chain,
+                                               String authType) throws CertificateException {
+                }
+
+                public X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+            };
+
+            sslContext.init(null, new TrustManager[] { tm }, null);
+        }
+
+        @Override
+        public Socket createSocket(Socket socket, String host, int port,
+                                   boolean autoClose) throws IOException, UnknownHostException {
+            return sslContext.getSocketFactory().createSocket(socket, host, port,
+                    autoClose);
+        }
+
+        @Override
+        public Socket createSocket() throws IOException {
+            return sslContext.getSocketFactory().createSocket();
+        }
+
     }
 }

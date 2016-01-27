@@ -21,14 +21,23 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.gbyakov.likework.sync.Exchange1C;
 import com.example.gbyakov.likework.sync.LikeWorkSyncAdapter;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.auth.NTLMSchemeFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+
+import java.net.URL;
+import java.security.KeyStore;
 
 public class LoginActivity extends AccountAuthenticatorActivity {
 
@@ -178,16 +187,35 @@ public class LoginActivity extends AccountAuthenticatorActivity {
             try
             {
                 DefaultHttpClient httpclient = new DefaultHttpClient();
+
+                URL url = new URL(mContext.getString(R.string.ws_link));
+                if ("https".equals(url.getProtocol())) {
+
+                    KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                    trustStore.load(null, null);
+
+                    SSLSocketFactory socketFactory = new Exchange1C.MySSLSocketFactory(trustStore);
+                    socketFactory.setHostnameVerifier(
+                            SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
+                    DefaultHttpClient client = new DefaultHttpClient();
+
+                    SchemeRegistry registry = new SchemeRegistry();
+                    registry.register(new Scheme("https", socketFactory, 443));
+                    ClientConnectionManager ccm = new ThreadSafeClientConnManager(client.getParams(), registry);
+                    httpclient = new DefaultHttpClient(ccm, client.getParams());
+
+                }
+
                 httpclient.getAuthSchemes().register("ntlm", new NTLMSchemeFactory());
                 httpclient.getCredentialsProvider().setCredentials(
                         new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
                         new NTCredentials(mUserName, mPassword, "", mDomain));
 
-                HttpGet httpGet = new HttpGet(getString(R.string.ws_link)+"?wsdl");
-                HttpResponse response = httpclient.execute(httpGet);
+                HttpPost httpPost = new HttpPost(mContext.getString(R.string.ws_link)+"?wsdl");
+                HttpResponse response = httpclient.execute(httpPost);
 
-                mStatusCode = response.getStatusLine().getStatusCode();
-
+                Integer mStatusCode = response.getStatusLine().getStatusCode();
                 if (mStatusCode == 200) {
                     AccountManager am = AccountManager.get(LoginActivity.this);
                     Account acc = new Account((mDomain.equals("") ? mUserName : mDomain+"\\"+mUserName),
