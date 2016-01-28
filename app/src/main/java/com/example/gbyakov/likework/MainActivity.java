@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
+import android.widget.TextView;
 
 import com.example.gbyakov.likework.data.LikeWorkContract;
 import com.example.gbyakov.likework.fragments.CallItemFragment;
@@ -81,6 +83,18 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.left_drawer);
         navigationView.setNavigationItemSelectedListener(this);
+        View headerView = navigationView.inflateHeaderView(R.layout.left_drawer_header);
+
+        Intent intent = getIntent();
+
+        String userName = intent.getStringExtra("username");
+        String userunit = intent.getStringExtra("userunit");
+
+        TextView vUserName = (TextView) headerView.findViewById(R.id.user_name);
+        vUserName.setText(userName);
+
+        TextView vUserUnit = (TextView) headerView.findViewById(R.id.user_unit);
+        vUserUnit.setText(userunit);
 
         mFragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();

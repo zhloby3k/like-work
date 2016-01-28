@@ -46,6 +46,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -65,8 +66,10 @@ public class Exchange1C {
     static private String mDomain;
     static private String mPassword;
     static private Context mContext;
+    static private Integer mStatusCode;
+    static private String mException;
 
-    Exchange1C(String username, String domain, String password, Context context) {
+    public Exchange1C(String username, String domain, String password, Context context) {
         mUserName   = username;
         mPassword   = password;
         mDomain     = domain;
@@ -144,18 +147,57 @@ public class Exchange1C {
             httpPost.setEntity(sEntity);
             HttpResponse response = httpclient.execute(httpPost);
 
-            Integer mStatusCode = response.getStatusLine().getStatusCode();
+            mStatusCode = response.getStatusLine().getStatusCode();
             if (mStatusCode == 200) {
                 return EntityUtils.toString(response.getEntity());
+            }
+            else if (mStatusCode == 500) {
+                mException = EntityUtils.toString(response.getEntity());
             }
 
         }
         catch (Exception e)
         {
+            mStatusCode = 300;
+            mException = e.getMessage();
             return "";
         }
 
         return "";
+    }
+
+    public HashMap GetUserInfo() {
+
+        HashMap<String, String> hm = new HashMap<>();
+
+        String response = SendRequest("GetUserInfo", "");
+        if (mStatusCode == 200){
+            Log.d(LOG_TAG, "GetUserInfo - start");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            try {
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document dom = builder.parse(new ByteArrayInputStream(response.getBytes()));
+                Element root = dom.getDocumentElement();
+                NodeList items = root.getElementsByTagName("m:name");
+                for (int i=0;i<items.getLength();i++){
+                    hm.put("username", items.item(i).getTextContent());
+                }
+                items = root.getElementsByTagName("m:unit");
+                for (int i=0;i<items.getLength();i++){
+                    hm.put("userunit", items.item(i).getTextContent());
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            Log.d(LOG_TAG, "GetUserInfo - finish");
+
+        }
+
+        hm.put("status", mStatusCode.toString());
+        hm.put("error", mException);
+
+        return hm;
+
     }
 
     public void UpdateOrders() {

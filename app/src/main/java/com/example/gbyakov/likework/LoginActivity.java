@@ -24,20 +24,7 @@ import android.widget.Toast;
 import com.example.gbyakov.likework.sync.Exchange1C;
 import com.example.gbyakov.likework.sync.LikeWorkSyncAdapter;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.NTCredentials;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.auth.NTLMSchemeFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-
-import java.net.URL;
-import java.security.KeyStore;
+import java.util.HashMap;
 
 public class LoginActivity extends AccountAuthenticatorActivity {
 
@@ -54,8 +41,12 @@ public class LoginActivity extends AccountAuthenticatorActivity {
         super.onCreate(savedInstanceState);
 
         AccountManager am = AccountManager.get(LoginActivity.this);
-        if (am.getAccountsByType(AUTHTOKEN_TYPE).length > 0) {
+        Account[] accounts = am.getAccountsByType(AUTHTOKEN_TYPE);
+        if (accounts.length > 0) {
+            Account account = accounts[0];
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            intent.putExtra("username", am.getUserData(account, "username"));
+            intent.putExtra("userunit", am.getUserData(account, "userunit"));
             startActivity(intent);
             finish();
         }
@@ -165,7 +156,9 @@ public class LoginActivity extends AccountAuthenticatorActivity {
         private final String mDomain;
         private final String mPassword;
         private Integer mStatusCode;
+        private String mError;
         private Context mContext;
+        private Bundle userData;
 
         UserLoginTask(Context context, String username, String password, String domain) {
             mContext    = context;
@@ -184,53 +177,25 @@ public class LoginActivity extends AccountAuthenticatorActivity {
                 return false;
             }
 
-            try
-            {
-                DefaultHttpClient httpclient = new DefaultHttpClient();
+            Exchange1C mExchange = new Exchange1C(mUserName, mDomain, mPassword, mContext);
+            HashMap<String,String> hmResult = mExchange.GetUserInfo();
 
-                URL url = new URL(mContext.getString(R.string.ws_link));
-                if ("https".equals(url.getProtocol())) {
+            mStatusCode = Integer.decode(hmResult.get("status"));
+            mError = hmResult.get("error");
+            if (mStatusCode == 200) {
+                userData = new Bundle();
+                userData.putString("username", hmResult.get("username"));
+                userData.putString("userunit", hmResult.get("userunit"));
 
-                    KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                    trustStore.load(null, null);
-
-                    SSLSocketFactory socketFactory = new Exchange1C.MySSLSocketFactory(trustStore);
-                    socketFactory.setHostnameVerifier(
-                            SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-
-                    DefaultHttpClient client = new DefaultHttpClient();
-
-                    SchemeRegistry registry = new SchemeRegistry();
-                    registry.register(new Scheme("https", socketFactory, 443));
-                    ClientConnectionManager ccm = new ThreadSafeClientConnManager(client.getParams(), registry);
-                    httpclient = new DefaultHttpClient(ccm, client.getParams());
-
-                }
-
-                httpclient.getAuthSchemes().register("ntlm", new NTLMSchemeFactory());
-                httpclient.getCredentialsProvider().setCredentials(
-                        new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
-                        new NTCredentials(mUserName, mPassword, "", mDomain));
-
-                HttpPost httpPost = new HttpPost(mContext.getString(R.string.ws_link)+"?wsdl");
-                HttpResponse response = httpclient.execute(httpPost);
-
-                Integer mStatusCode = response.getStatusLine().getStatusCode();
-                if (mStatusCode == 200) {
-                    AccountManager am = AccountManager.get(LoginActivity.this);
-                    Account acc = new Account((mDomain.equals("") ? mUserName : mDomain+"\\"+mUserName),
-                            LoginActivity.this.AUTHTOKEN_TYPE);
-                    am.addAccountExplicitly(acc, mPassword, null);
-                    LikeWorkSyncAdapter.initializeSyncAdapter(mContext);
-                }
-
-                return (mStatusCode == 200);
+                AccountManager am = AccountManager.get(LoginActivity.this);
+                Account acc = new Account((mDomain.equals("") ? mUserName : mDomain+"\\"+mUserName),
+                        LoginActivity.this.AUTHTOKEN_TYPE);
+                am.addAccountExplicitly(acc, mPassword, userData);
+                LikeWorkSyncAdapter.initializeSyncAdapter(mContext);
             }
-            catch (Exception e)
-            {
-                mStatusCode = 300;
-                return false;
-            }
+
+            return (mStatusCode == 200);
+
         }
 
         @Override
@@ -239,6 +204,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
             if (success) {
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                intent.putExtras(userData);
                 startActivity(intent);
                 finish();
             } else {
@@ -253,7 +219,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
                     toast.show();
                 } else {
                     Toast toast = Toast.makeText(getApplicationContext(),
-                            "Проверьте подключение к корпоративной сети и попробуйте позже", Toast.LENGTH_SHORT);
+                            mError, Toast.LENGTH_SHORT);
                     toast.show();
                 }
             }
