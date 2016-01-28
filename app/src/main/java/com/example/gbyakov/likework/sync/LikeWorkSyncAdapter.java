@@ -90,6 +90,7 @@ public class LikeWorkSyncAdapter extends AbstractThreadedSyncAdapter {
             ContentResolver.addPeriodicSync(account,
                     authority, new Bundle(), SYNC_INTERVAL);
         }
+        ContentResolver.setIsSyncable(account, authority, 1);
         ContentResolver.setSyncAutomatically(account, authority, true);
         syncImmediately(context);
 
