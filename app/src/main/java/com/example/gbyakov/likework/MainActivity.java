@@ -4,7 +4,10 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +16,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -30,17 +34,27 @@ import com.example.gbyakov.likework.fragments.OrdersListFragment;
 import com.example.gbyakov.likework.fragments.RecordItemFragment;
 import com.example.gbyakov.likework.fragments.RecordsListFragment;
 import com.example.gbyakov.likework.fragments.RecordsTabFragment;
+import com.example.gbyakov.likework.sync.LikeWorkSyncAdapter;
 import com.github.clans.fab.FloatingActionMenu;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         OrdersListFragment.OnItemSelectedListener,
         RecordsListFragment.OnItemSelectedListener,
-        CallsListFragment.OnItemSelectedListener{
+        CallsListFragment.OnItemSelectedListener,
+        SwipeRefreshLayout.OnRefreshListener{
 
     FragmentManager mFragmentManager;
     ActionBarDrawerToggle mDrawerToggle;
     public FloatingActionMenu fabMenu;
+    public SwipeRefreshLayout mSwipeRefresh;
+
+    private BroadcastReceiver syncFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mSwipeRefresh.setRefreshing(false);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +122,14 @@ public class MainActivity extends AppCompatActivity
             toolbarShadow.setVisibility(View.GONE);
         }
         createCustomAnimation();
+
+        mSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
+        mSwipeRefresh.setOnRefreshListener(this);
+
+        mSwipeRefresh.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
     }
 
     @Override
@@ -148,6 +170,18 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(syncFinishedReceiver, new IntentFilter(LikeWorkSyncAdapter.SYNC_FINISHED));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(syncFinishedReceiver);
     }
 
     @Override
@@ -227,4 +261,10 @@ public class MainActivity extends AppCompatActivity
 
         menu.setIconToggleAnimatorSet(set);
     }
+
+    @Override
+    public void onRefresh() {
+        LikeWorkSyncAdapter.syncImmediately(this);
+    }
+
 }

@@ -9,13 +9,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.example.gbyakov.likework.MainActivity;
 import com.example.gbyakov.likework.R;
 import com.example.gbyakov.likework.adapters.OrderAdapter;
 import com.example.gbyakov.likework.data.LikeWorkContract;
@@ -64,6 +67,17 @@ public class OrdersListFragment extends Fragment implements LoaderManager.Loader
                     mListener.OnItemSelected(itemUri);
                 }
                 mPosition = position;
+            }
+        });
+        mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                SwipeRefreshLayout mSwipeRefresh = ((MainActivity) getActivity()).mSwipeRefresh;
+                mSwipeRefresh.setEnabled((firstVisibleItem == 0));
             }
         });
 
