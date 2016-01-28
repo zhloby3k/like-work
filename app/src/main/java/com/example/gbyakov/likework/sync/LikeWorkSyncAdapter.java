@@ -6,6 +6,7 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.os.Build;
@@ -19,6 +20,8 @@ public class LikeWorkSyncAdapter extends AbstractThreadedSyncAdapter {
     public final String LOG_TAG = LikeWorkSyncAdapter.class.getSimpleName();
     public static final int SYNC_INTERVAL = 60 * 180;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
+
+    public static final String SYNC_FINISHED = "1C_SYNC_FINISHED";
 
     public LikeWorkSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -51,6 +54,9 @@ public class LikeWorkSyncAdapter extends AbstractThreadedSyncAdapter {
         mExchange.UpdateStates();
         mExchange.UpdateParts();
         mExchange.UpdateOperations();
+
+        Intent i = new Intent(SYNC_FINISHED);
+        getContext().sendBroadcast(i);
 
         Log.d(LOG_TAG, "End sync");
 
