@@ -8,10 +8,12 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -192,6 +194,11 @@ public class LoginActivity extends AccountAuthenticatorActivity {
                         LoginActivity.this.AUTHTOKEN_TYPE);
                 am.addAccountExplicitly(acc, mPassword, userData);
                 LikeWorkSyncAdapter.initializeSyncAdapter(mContext);
+
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean("enable_periodic_sync", true);
+                editor.commit();
             }
 
             return (mStatusCode == 200);

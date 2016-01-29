@@ -31,6 +31,7 @@ import com.example.gbyakov.likework.fragments.CallsListFragment;
 import com.example.gbyakov.likework.fragments.KpiGridFragment;
 import com.example.gbyakov.likework.fragments.OrderItemFragment;
 import com.example.gbyakov.likework.fragments.OrdersListFragment;
+import com.example.gbyakov.likework.fragments.PreferencesFragment;
 import com.example.gbyakov.likework.fragments.RecordItemFragment;
 import com.example.gbyakov.likework.fragments.RecordsListFragment;
 import com.example.gbyakov.likework.fragments.RecordsTabFragment;
@@ -164,7 +165,9 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.container, new CallsListFragment()).commit();
         } else if (id == R.id.nav_settings) {
-
+            if (bseCount>0) mFragmentManager.popBackStack();
+            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.container, new PreferencesFragment()).commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

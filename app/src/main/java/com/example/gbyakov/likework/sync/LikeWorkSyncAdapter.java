@@ -80,24 +80,32 @@ public class LikeWorkSyncAdapter extends AbstractThreadedSyncAdapter {
         return (accounts.length > 0) ? accounts[0] : null;
     }
 
-
-    public static void initializeSyncAdapter(Context context) {
-
+    public static void changePeriodicSync(Context context, Boolean enableSync, int interval, int flexTime) {
         Account account = getSyncAccount(context);
         String authority = context.getString(R.string.content_authority);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            SyncRequest request = new SyncRequest.Builder().
-                    syncPeriodic(SYNC_INTERVAL, SYNC_FLEXTIME).
-                    setSyncAdapter(account, authority).
-                    setExtras(new Bundle()).build();
-            ContentResolver.requestSync(request);
+        if (enableSync) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                SyncRequest request = new SyncRequest.Builder().
+                        syncPeriodic(interval, flexTime).
+                        setSyncAdapter(account, authority).
+                        setExtras(new Bundle()).build();
+                ContentResolver.requestSync(request);
+            } else {
+                ContentResolver.addPeriodicSync(account,
+                        authority, new Bundle(), interval);
+            }
+            ContentResolver.setIsSyncable(account, authority, 1);
+            ContentResolver.setSyncAutomatically(account, authority, true);
         } else {
-            ContentResolver.addPeriodicSync(account,
-                    authority, new Bundle(), SYNC_INTERVAL);
+            ContentResolver.removePeriodicSync(account, authority, new Bundle());
+            ContentResolver.setSyncAutomatically(account, authority, false);
         }
-        ContentResolver.setIsSyncable(account, authority, 1);
-        ContentResolver.setSyncAutomatically(account, authority, true);
+    }
+
+    public static void initializeSyncAdapter(Context context) {
+
+        changePeriodicSync(context, true, SYNC_INTERVAL, SYNC_FLEXTIME);
         syncImmediately(context);
 
     }

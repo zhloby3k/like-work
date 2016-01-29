@@ -1,0 +1,17 @@
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:key="enable_periodic_sync"
+        android:title="Автоматическая синхронизация"
+        android:summary="Синхронизация через определенные интервалы времени"/>
+
+    <ListPreference
+        android:defaultValue="@string/auto_sync_interval_default"
+        android:dependency="enable_periodic_sync"
+        android:entries="@array/auto_sync_intervals"
+        android:entryValues="@array/auto_sync_interval_values"
+        android:key="periodic_sync_interval"
+        android:title="@string/auto_sync_interval" />
+
+</PreferenceScreen>
