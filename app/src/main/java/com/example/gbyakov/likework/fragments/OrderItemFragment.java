@@ -1,5 +1,6 @@
 package com.example.gbyakov.likework.fragments;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,8 +19,11 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.gbyakov.likework.MainActivity;
 import com.example.gbyakov.likework.R;
 import com.example.gbyakov.likework.data.LikeWorkContract;
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -30,6 +34,7 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
 
     public static final String ORDER_URI = "URI";
     private static final int ORDER_LOADER = 0;
+    private static final int PHONES_LOADER = 1;
 
     private static final String[] ORDER_COLUMNS = {
             LikeWorkContract.OrderEntry.TABLE_NAME + "." + LikeWorkContract.OrderEntry._ID,
@@ -40,7 +45,9 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
             LikeWorkContract.OrderEntry.COLUMN_SUM,
             LikeWorkContract.OrderEntry.COLUMN_TYPE,
             "Client."+LikeWorkContract.ClientEntry.COLUMN_NAME + " ClientName",
+            "Client."+LikeWorkContract.ClientEntry.COLUMN_ID_1C + " ClientID",
             "Customer."+LikeWorkContract.ClientEntry.COLUMN_NAME + " CustomerName",
+            "Customer."+LikeWorkContract.ClientEntry.COLUMN_ID_1C + " CustomerID",
             LikeWorkContract.StatusEntry.COLUMN_NAME,
             LikeWorkContract.CarEntry.COLUMN_BRAND,
             LikeWorkContract.CarEntry.COLUMN_MODEL,
@@ -65,6 +72,8 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
 
     private Uri mUri;
     private String mDocId;
+    private String mClientID;
+    private String mCustomerID;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -100,11 +109,22 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if ( mUri != null ) {
+        if ( mUri == null ) {
+            return null;
+        } else if ( id == ORDER_LOADER ) {
             return new CursorLoader(
                     getActivity(),
                     mUri,
                     ORDER_COLUMNS,
+                    null,
+                    null,
+                    null
+            );
+        } else if ( id == PHONES_LOADER ) {
+            return new CursorLoader(
+                    getActivity(),
+                    LikeWorkContract.PhoneEntry.buildClientUri(mClientID),
+                    null,
                     null,
                     null,
                     null
@@ -116,7 +136,7 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        if (data != null && data.moveToFirst()) {
+        if (loader.getId() == ORDER_LOADER && data != null && data.moveToFirst()) {
 
             long dateInMS    = data.getLong(data.getColumnIndex(LikeWorkContract.OrderEntry.COLUMN_DATE));
             Date date        = new Date(dateInMS);
@@ -165,6 +185,10 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
             android.support.v7.app.ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
             if (actionBar != null) actionBar.setTitle("Заказ-наряд "+number);
 
+            mClientID = data.getString(data.getColumnIndex("ClientID"));
+            mCustomerID = data.getString(data.getColumnIndex("CustomerID"));
+            getLoaderManager().restartLoader(PHONES_LOADER, null, this);
+
             mDocId = data.getString(data.getColumnIndex(LikeWorkContract.OrderEntry.COLUMN_ID_1C));
             viewPager.setAdapter(new OrderTabPagerAdapter(getChildFragmentManager()));
 
@@ -174,8 +198,41 @@ public class OrderItemFragment extends Fragment implements LoaderManager.LoaderC
                 }
             });
 
-        }
+        } else if (loader.getId() == PHONES_LOADER && data != null) {
 
+            FloatingActionMenu fabMenu = ((MainActivity) getActivity()).fabMenu;
+            fabMenu.removeAllMenuButtons();
+
+            while (data.moveToNext()) {
+
+                String pName    = data.getString(data.getColumnIndex(LikeWorkContract.PhoneEntry.COLUMN_NAME));
+                String pDescr   = data.getString(data.getColumnIndex(LikeWorkContract.PhoneEntry.COLUMN_DESCR));
+                String pNumber  = data.getString(data.getColumnIndex(LikeWorkContract.PhoneEntry.COLUMN_PHONE));
+
+                FloatingActionButton fabCall = new FloatingActionButton(getActivity());
+                fabCall.setButtonSize(FloatingActionButton.SIZE_MINI);
+                fabCall.setLabelText(pName + ": " + pDescr);
+                fabCall.setImageResource(R.drawable.ic_phone_in_talk);
+                fabCall.setColorNormal(getResources().getColor(R.color.colorAccent));
+                fabCall.setTag(pNumber);
+                fabMenu.addMenuButton(fabCall);
+                fabCall.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_DIAL);
+                        intent.setData(Uri.parse("tel:" + v.getTag().toString()));
+                        startActivity(intent);
+                    }
+                });
+
+            }
+
+            if (data.getCount() == 0 && !mCustomerID.equals(mClientID)) {
+                mClientID = mCustomerID;
+                getLoaderManager().restartLoader(PHONES_LOADER, null, this);
+            };
+
+        }
     }
 
     @Override
