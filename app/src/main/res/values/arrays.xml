@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="auto_sync_intervals">
+        <item>Каждый час</item>
+        <item>Каждые 2 часа</item>
+        <item>Каждые 3 часа</item>
+        <item>Каждые 6 часов</item>
+        <item>Каждые 12 часов</item>
+        <item>Раз в день</item>
+    </string-array>
+
+    <string-array name="auto_sync_interval_values">
+        <item>3600</item>
+        <item>7200</item>
+        <item>@string/auto_sync_interval_default</item>
+        <item>21600</item>
+        <item>86400</item>
+    </string-array>
+
+    <string name="auto_sync_interval_default">10800</string>
+    <string name="auto_sync_interval">Интервал синхронизации</string>
+
+</resources>
