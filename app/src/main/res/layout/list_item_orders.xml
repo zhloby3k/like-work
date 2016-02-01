@@ -28,13 +28,13 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_width="fill_parent">
+            android:layout_width="match_parent">
 
             <TextView
                 android:id="@+id/list_item_order_car"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="HIGHLANDER - Е 287 ТА 159"
                 style="@style/TextAppearance.AppCompat.Body2"
@@ -44,12 +44,12 @@
 
             <TextView
                 android:id="@+id/list_item_order_sum"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="182 900.34"
                 style="@style/TextAppearance.AppCompat.Body2"
                 android:gravity="right"
-                android:layout_weight="6" />
+                android:layout_weight="1" />
 
         </LinearLayout>
 
@@ -64,27 +64,27 @@
 
 
         <LinearLayout
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_width="fill_parent">
+            android:layout_width="match_parent">
 
             <TextView
                 android:id="@+id/list_item_order_status"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="ТО - 20 000 км"
                 style="@style/TextAppearance.AppCompat.Caption"
-                android:layout_weight="2"
+                android:layout_weight="3"
                 android:ellipsize="end"
                 android:singleLine="true" />
 
             <TextView
                 android:id="@+id/list_item_order_date"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="18.12.15"
                 style="@style/TextAppearance.AppCompat.Caption"
-                android:layout_weight="6"
+                android:layout_weight="1"
                 android:gravity="right" />
 
         </LinearLayout>
