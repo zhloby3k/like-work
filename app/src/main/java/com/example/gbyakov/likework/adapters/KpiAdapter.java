@@ -90,6 +90,6 @@ public class KpiAdapter extends CursorAdapter {
 
         if (value >= 95) viewHolder.containerView.setBackgroundColor(Color.parseColor("#C8E6C9"));
         else if (value >= 85 && value < 95) viewHolder.containerView.setBackgroundColor(Color.parseColor("#FFECB3"));
-        else if (value > 0 && value < 85) viewHolder.containerView.setBackgroundColor(Color.parseColor("#FFCDD2"));
+        else if (value < 85) viewHolder.containerView.setBackgroundColor(Color.parseColor("#FFCDD2"));
     }
 }
