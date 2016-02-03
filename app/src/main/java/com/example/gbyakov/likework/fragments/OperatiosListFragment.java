@@ -6,11 +6,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
 
+import com.example.gbyakov.likework.MainActivity;
 import com.example.gbyakov.likework.R;
 import com.example.gbyakov.likework.adapters.OperationAdapter;
 import com.example.gbyakov.likework.data.LikeWorkContract;
@@ -47,7 +50,17 @@ public class OperatiosListFragment extends Fragment implements LoaderManager.Loa
 
         mListView = (ListView) x.findViewById(R.id.operations_listview);
         mListView.setAdapter(mOperationAdapter);
+        mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+            }
 
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                SwipeRefreshLayout mSwipeRefresh = ((MainActivity) getActivity()).mSwipeRefresh;
+                mSwipeRefresh.setEnabled(false);
+            }
+        });
         return x;
     }
 
