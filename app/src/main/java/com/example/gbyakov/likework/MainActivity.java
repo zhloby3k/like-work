@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,7 +20,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
@@ -35,8 +38,11 @@ import com.example.gbyakov.likework.fragments.PreferencesFragment;
 import com.example.gbyakov.likework.fragments.RecordItemFragment;
 import com.example.gbyakov.likework.fragments.RecordsListFragment;
 import com.example.gbyakov.likework.fragments.RecordsTabFragment;
+import com.example.gbyakov.likework.gcm.RegistrationIntentService;
 import com.example.gbyakov.likework.sync.LikeWorkSyncAdapter;
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -44,6 +50,10 @@ public class MainActivity extends AppCompatActivity
         RecordsListFragment.OnItemSelectedListener,
         CallsListFragment.OnItemSelectedListener,
         SwipeRefreshLayout.OnRefreshListener{
+
+    private final String LOG_TAG = LoginActivity.class.getSimpleName();
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
 
     FragmentManager mFragmentManager;
     ActionBarDrawerToggle mDrawerToggle;
@@ -131,6 +141,16 @@ public class MainActivity extends AppCompatActivity
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
+
+        if (checkPlayServices()) {
+            SharedPreferences sharedPreferences =
+                    PreferenceManager.getDefaultSharedPreferences(this);
+            boolean sentToken = sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false);
+            if (!sentToken) {
+                intent = new Intent(this, RegistrationIntentService.class);
+                startService(intent);
+            }
+        }
     }
 
     @Override
@@ -271,6 +291,22 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onRefresh() {
         LikeWorkSyncAdapter.syncImmediately(this);
+    }
+
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Log.i(LOG_TAG, "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
     }
 
 }
