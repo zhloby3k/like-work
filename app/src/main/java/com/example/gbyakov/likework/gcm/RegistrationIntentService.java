@@ -30,7 +30,7 @@ public class RegistrationIntentService extends IntentService {
                 InstanceID instanceID = InstanceID.getInstance(this);
                 String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
                         GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-                boolean sentIdToServer = sendRegistrationToServer(instanceID.getId());
+                boolean sentIdToServer = sendRegistrationToServer(token);
                 sharedPreferences.edit().putBoolean(MainActivity.SENT_TOKEN_TO_SERVER, sentIdToServer).apply();
             }
         } catch (Exception e) {

@@ -34,7 +34,6 @@ import org.w3c.dom.NodeList;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -80,8 +79,7 @@ public class Exchange1C {
         mHttpClient = new DefaultHttpClient();
 
         try {
-            URL url = new URL(mContext.getString(R.string.ws_link));
-            if ("https".equals(url.getProtocol())) {
+            if ("https".equals(mContext.getString(R.string.ws_link).substring(0,5))) {
 
                 KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
                 trustStore.load(null, null);
