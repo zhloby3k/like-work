@@ -53,10 +53,10 @@ public class GCMListenerService extends GcmListenerService {
         PendingIntent contentIntent =
                 PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Bitmap largeIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_comment);
+        Bitmap largeIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_gcm);
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_comment)
+                        .setSmallIcon(R.drawable.ic_gcm)
                         .setLargeIcon(largeIcon)
                         .setContentTitle(this.getString(R.string.gcm_message_title))
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
