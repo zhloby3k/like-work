@@ -68,6 +68,33 @@ public class MainActivity extends AppCompatActivity
     };
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Bundle params = intent.getExtras();
+        String id_1c = params.getString("id_1c");
+
+        int bseCount = mFragmentManager.getBackStackEntryCount();
+        if (bseCount>0) mFragmentManager.popBackStack();
+
+        Bundle args = new Bundle();
+        args.putParcelable(OrderItemFragment.ORDER_URI, LikeWorkContract.OrderEntry.buildOrderID1C(id_1c));
+
+        OrderItemFragment fOrderItem = new OrderItemFragment();
+        fOrderItem.setArguments(args);
+
+        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container, new OrdersListFragment()).commit();
+
+        fragmentTransaction = mFragmentManager.beginTransaction();
+        fragmentTransaction
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                .replace(R.id.container, fOrderItem)
+                .addToBackStack(null).commit();
+
+        fabMenu.showMenuButton(true);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
@@ -151,6 +178,10 @@ public class MainActivity extends AppCompatActivity
                 startService(intent);
             }
         }
+
+        String id_1c = intent.getStringExtra("id_1c");
+        if (id_1c != null) onNewIntent(intent);
+
     }
 
     @Override

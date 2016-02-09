@@ -62,7 +62,15 @@ public class LikeWorkContract {
             return CONTENT_URI.buildUpon().appendPath("withgroups").build();
         }
 
+        public static Uri buildOrderID1C(String id_1c) {
+            return CONTENT_URI.buildUpon().appendPath(id_1c).build();
+        }
+
         public static String getIDFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+
+        public static String getID1CFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
         }
     }
