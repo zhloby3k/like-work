@@ -13,4 +13,5 @@
     <string name="content_authority">com.example.gbyakov.likework</string>
     <string name="today">Сегодня</string>
     <string name="tomorrow">Завтра</string>
+    <string name="gcm_message_title">VerraDMS</string>
 </resources>

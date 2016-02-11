@@ -32,6 +32,7 @@ public class LikeWorkProvider extends ContentProvider {
 
     static final int ORDER              = 100;
     static final int ORDER_ID           = 101;
+    static final int ORDER_ID_1C        = 102;
     static final int ORDER_WITH_GROUPS  = 110;
     static final int RECORD             = 200;
     static final int RECORD_ID          = 201;
@@ -66,6 +67,7 @@ public class LikeWorkProvider extends ContentProvider {
         matcher.addURI(authority, LikeWorkContract.PATH_ORDER,                  ORDER);
         matcher.addURI(authority, LikeWorkContract.PATH_ORDER + "/#",           ORDER_ID);
         matcher.addURI(authority, LikeWorkContract.PATH_ORDER + "/withgroups",  ORDER_WITH_GROUPS);
+        matcher.addURI(authority, LikeWorkContract.PATH_ORDER + "/*",           ORDER_ID_1C);
         matcher.addURI(authority, LikeWorkContract.PATH_RECORD,                 RECORD);
         matcher.addURI(authority, LikeWorkContract.PATH_RECORD + "/dates",      RECORD_DATES);
         matcher.addURI(authority, LikeWorkContract.PATH_RECORD + "/#",          RECORD_ID);
@@ -139,6 +141,37 @@ public class LikeWorkProvider extends ContentProvider {
 
                 selection = OrderEntry.TABLE_NAME + "." + OrderEntry._ID + " = ?";
                 selectionArgs = new String[] {OrderEntry.getIDFromUri(uri)};
+
+                retCursor = qBuilder.query(mOpenHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+            case ORDER_ID_1C:
+            {
+                SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
+                qBuilder.setTables(OrderEntry.TABLE_NAME +
+                                " LEFT JOIN " + CarEntry.TABLE_NAME +
+                                " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_CAR_ID +
+                                " = " + CarEntry.TABLE_NAME + "." + CarEntry.COLUMN_ID_1C +
+                                " LEFT JOIN " + ClientEntry.TABLE_NAME + " AS Client" +
+                                " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_CLIENT_ID +
+                                " = Client." + ClientEntry.COLUMN_ID_1C +
+                                " LEFT JOIN " + ClientEntry.TABLE_NAME + " AS Customer" +
+                                " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_CUSTOMER_ID +
+                                " = Customer." + ClientEntry.COLUMN_ID_1C +
+                                " LEFT JOIN " + StatusEntry.TABLE_NAME +
+                                " ON " + OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_STATUS_ID +
+                                " = " + StatusEntry.TABLE_NAME + "." + StatusEntry.COLUMN_ID_1C
+                );
+
+                selection = OrderEntry.TABLE_NAME + "." + OrderEntry.COLUMN_ID_1C + " = ?";
+                selectionArgs = new String[] {OrderEntry.getID1CFromUri(uri)};
 
                 retCursor = qBuilder.query(mOpenHelper.getReadableDatabase(),
                         projection,

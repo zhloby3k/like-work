@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,7 +20,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
@@ -35,8 +38,11 @@ import com.example.gbyakov.likework.fragments.PreferencesFragment;
 import com.example.gbyakov.likework.fragments.RecordItemFragment;
 import com.example.gbyakov.likework.fragments.RecordsListFragment;
 import com.example.gbyakov.likework.fragments.RecordsTabFragment;
+import com.example.gbyakov.likework.gcm.RegistrationIntentService;
 import com.example.gbyakov.likework.sync.LikeWorkSyncAdapter;
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -44,6 +50,11 @@ public class MainActivity extends AppCompatActivity
         RecordsListFragment.OnItemSelectedListener,
         CallsListFragment.OnItemSelectedListener,
         SwipeRefreshLayout.OnRefreshListener{
+
+    private final String LOG_TAG = LoginActivity.class.getSimpleName();
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
+    public static final String ENABLE_NOTIFICATIONS = "enable_notifications";
 
     FragmentManager mFragmentManager;
     ActionBarDrawerToggle mDrawerToggle;
@@ -56,6 +67,33 @@ public class MainActivity extends AppCompatActivity
             mSwipeRefresh.setRefreshing(false);
         }
     };
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Bundle params = intent.getExtras();
+        String id_1c = params.getString("id_1c");
+
+        int bseCount = mFragmentManager.getBackStackEntryCount();
+        if (bseCount>0) mFragmentManager.popBackStack();
+
+        Bundle args = new Bundle();
+        args.putParcelable(OrderItemFragment.ORDER_URI, LikeWorkContract.OrderEntry.buildOrderID1C(id_1c));
+
+        OrderItemFragment fOrderItem = new OrderItemFragment();
+        fOrderItem.setArguments(args);
+
+        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container, new OrdersListFragment()).commit();
+
+        fragmentTransaction = mFragmentManager.beginTransaction();
+        fragmentTransaction
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                .replace(R.id.container, fOrderItem)
+                .addToBackStack(null).commit();
+
+        fabMenu.showMenuButton(true);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +169,20 @@ public class MainActivity extends AppCompatActivity
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
+
+        if (checkPlayServices()) {
+            SharedPreferences sharedPreferences =
+                    PreferenceManager.getDefaultSharedPreferences(this);
+            boolean sentToken = sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false);
+            if (!sentToken) {
+                intent = new Intent(this, RegistrationIntentService.class);
+                startService(intent);
+            }
+        }
+
+        String id_1c = intent.getStringExtra("id_1c");
+        if (id_1c != null) onNewIntent(intent);
+
     }
 
     @Override
@@ -271,6 +323,22 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onRefresh() {
         LikeWorkSyncAdapter.syncImmediately(this);
+    }
+
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Log.i(LOG_TAG, "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
     }
 
 }

@@ -3,6 +3,7 @@ package com.example.gbyakov.likework.sync;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Build;
 import android.util.Log;
 
 import com.example.gbyakov.likework.R;
@@ -33,7 +34,6 @@ import org.w3c.dom.NodeList;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -68,12 +68,44 @@ public class Exchange1C {
     static private Context mContext;
     static private Integer mStatusCode;
     static private String mException;
+    static private DefaultHttpClient mHttpClient;
 
     public Exchange1C(String username, String domain, String password, Context context) {
         mUserName   = username;
         mPassword   = password;
         mDomain     = domain;
         mContext    = context;
+
+        mHttpClient = new DefaultHttpClient();
+
+        try {
+            if ("https".equals(mContext.getString(R.string.ws_link).substring(0,5))) {
+
+                KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                trustStore.load(null, null);
+
+                SSLSocketFactory socketFactory = new MySSLSocketFactory(trustStore);
+                socketFactory.setHostnameVerifier(
+                        SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
+                DefaultHttpClient client = new DefaultHttpClient();
+
+                SchemeRegistry registry = new SchemeRegistry();
+                registry.register(new Scheme("https", socketFactory, 443));
+                ClientConnectionManager ccm = new ThreadSafeClientConnManager(client.getParams(), registry);
+                mHttpClient = new DefaultHttpClient(ccm, client.getParams());
+
+            }
+
+            mHttpClient.getAuthSchemes().register("ntlm", new NTLMSchemeFactory());
+            mHttpClient.getCredentialsProvider().setCredentials(
+                    new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
+                    new NTCredentials(mUserName, mPassword, "", mDomain));
+        }
+        catch (Exception e) {
+            Log.d(LOG_TAG, "Failed to create httpclient", e);
+        }
+
     }
 
     private static String add_params(JSONObject object) {
@@ -114,38 +146,13 @@ public class Exchange1C {
 
         try
         {
-            DefaultHttpClient httpclient = new DefaultHttpClient();
-
-            URL url = new URL(mContext.getString(R.string.ws_link));
-            if ("https".equals(url.getProtocol())) {
-
-                KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                trustStore.load(null, null);
-
-                SSLSocketFactory socketFactory = new MySSLSocketFactory(trustStore);
-                socketFactory.setHostnameVerifier(
-                        SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-
-                DefaultHttpClient client = new DefaultHttpClient();
-
-                SchemeRegistry registry = new SchemeRegistry();
-                registry.register(new Scheme("https", socketFactory, 443));
-                ClientConnectionManager ccm = new ThreadSafeClientConnManager(client.getParams(), registry);
-                httpclient = new DefaultHttpClient(ccm, client.getParams());
-
-            }
-
-            httpclient.getAuthSchemes().register("ntlm", new NTLMSchemeFactory());
-            httpclient.getCredentialsProvider().setCredentials(
-                    new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
-                    new NTCredentials(mUserName, mPassword, "", mDomain));
 
             HttpPost httpPost = new HttpPost(mContext.getString(R.string.ws_link));
 
             StringEntity sEntity = new StringEntity(request, HTTP.UTF_8);
             sEntity.setContentType("text/xml");
             httpPost.setEntity(sEntity);
-            HttpResponse response = httpclient.execute(httpPost);
+            HttpResponse response = mHttpClient.execute(httpPost);
 
             mStatusCode = response.getStatusLine().getStatusCode();
             if (mStatusCode == 200) {
@@ -482,6 +489,26 @@ public class Exchange1C {
             }
             Log.d(LOG_TAG, "GetKPI - finish");
         }
+
+    }
+
+    public boolean RegDevice(String id) {
+
+        Log.d(LOG_TAG, "RegDevice - start");
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("id",    id);
+            jsonParams.put("os",    Build.VERSION.RELEASE);
+            jsonParams.put("model", Build.MODEL);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        String data = add_params(jsonParams);
+
+        String response = SendRequest("RegDevice", data);
+        Log.d(LOG_TAG, "RegDevice - start");
+        return response.contains("true");
 
     }
 

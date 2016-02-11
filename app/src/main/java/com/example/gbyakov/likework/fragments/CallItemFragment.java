@@ -285,6 +285,8 @@ public class CallItemFragment extends Fragment implements LoaderManager.LoaderCa
 
             }
 
+            getLoaderManager().destroyLoader(QUESTIONS_LOADER);
+
         } else if (loader.getId() == ANSWERS_LOADER && data != null) {
 
             TextView qHeader= (TextView) mQuestion.findViewById(R.id.question_header);
