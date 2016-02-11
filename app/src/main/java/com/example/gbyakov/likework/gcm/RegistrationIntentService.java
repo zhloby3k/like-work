@@ -32,6 +32,7 @@ public class RegistrationIntentService extends IntentService {
                         GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
                 boolean sentIdToServer = sendRegistrationToServer(token);
                 sharedPreferences.edit().putBoolean(MainActivity.SENT_TOKEN_TO_SERVER, sentIdToServer).apply();
+                sharedPreferences.edit().putBoolean(MainActivity.ENABLE_NOTIFICATIONS, sentIdToServer).apply();
             }
         } catch (Exception e) {
             Log.d(TAG, "Failed to complete token refresh", e);

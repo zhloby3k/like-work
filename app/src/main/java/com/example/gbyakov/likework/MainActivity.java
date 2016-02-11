@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity
     private final String LOG_TAG = LoginActivity.class.getSimpleName();
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
+    public static final String ENABLE_NOTIFICATIONS = "enable_notifications";
 
     FragmentManager mFragmentManager;
     ActionBarDrawerToggle mDrawerToggle;

@@ -14,4 +14,9 @@
         android:key="periodic_sync_interval"
         android:title="@string/auto_sync_interval" />
 
+    <SwitchPreference
+        android:key="enable_notifications"
+        android:title="Уведомления"
+        android:summary="Получение уведомлений"/>
+
 </PreferenceScreen>
