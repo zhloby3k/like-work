@@ -269,6 +269,9 @@ public class MainActivity extends AppCompatActivity
                     .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                     .replace(R.id.container, fRecordItem)
                     .addToBackStack(null).commit();
+
+            fabMenu.showMenuButton(true);
+
         } else if (uriType.equals(LikeWorkContract.CallEntry.CONTENT_ITEM_TYPE)) {
             Bundle args = new Bundle();
             args.putParcelable(CallItemFragment.CALL_URI, itemUri);
