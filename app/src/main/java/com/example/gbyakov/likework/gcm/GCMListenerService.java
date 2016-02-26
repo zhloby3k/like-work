@@ -18,6 +18,8 @@ import com.example.gbyakov.likework.MainActivity;
 import com.example.gbyakov.likework.R;
 import com.google.android.gms.gcm.GcmListenerService;
 
+import java.util.Random;
+
 public class GCMListenerService extends GcmListenerService {
 
     private static final String LOG_TAG = "GCMListenerService";
@@ -53,6 +55,9 @@ public class GCMListenerService extends GcmListenerService {
     }
 
     private void sendNotification(String message, String id) {
+        Random random = new Random();
+        NOTIFICATION_ID = random.nextInt(9999 - 1000) + 1000;
+
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -72,11 +77,10 @@ public class GCMListenerService extends GcmListenerService {
                         .setAutoCancel(true)
                         .setDefaults(Notification.DEFAULT_SOUND)
                         .setContentText(message)
+                        .setGroup(this.getString(R.string.gcm_message_title))
                         .setTicker(message)
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT);
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-
-        NOTIFICATION_ID++;
     }
 }
