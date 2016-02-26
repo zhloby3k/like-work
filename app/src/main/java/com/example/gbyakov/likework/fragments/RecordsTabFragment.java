@@ -73,7 +73,6 @@ public class RecordsTabFragment extends Fragment {
                 null,
                 selection,
                 selectionArgs,
-                null,
                 null);
 
         if (cursor != null) {

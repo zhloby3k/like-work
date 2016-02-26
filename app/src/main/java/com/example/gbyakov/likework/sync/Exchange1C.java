@@ -408,7 +408,6 @@ public class Exchange1C {
                 null,
                 null,
                 null,
-                null,
                 null);
 
         if (cursor != null && cursor.getCount() > 0) {
@@ -565,7 +564,6 @@ public class Exchange1C {
                 null,
                 selection,
                 selectionArgs,
-                null,
                 null);
 
         if (cursor != null && cursor.moveToFirst()) {
@@ -648,7 +646,6 @@ public class Exchange1C {
                 projection,
                 selection,
                 selectionArgs,
-                null,
                 null);
 
         if (cursor != null && cursor.moveToFirst()) {
@@ -723,7 +720,6 @@ public class Exchange1C {
                 projection,
                 selection,
                 selectionArgs,
-                null,
                 null);
 
         if (cursor != null && cursor.moveToFirst()) {
@@ -888,7 +884,6 @@ public class Exchange1C {
                 null,
                 selection,
                 selectionArgs,
-                null,
                 null);
 
         if (cursor != null && cursor.moveToFirst()) {
@@ -927,7 +922,6 @@ public class Exchange1C {
                 null,
                 selection,
                 selectionArgs,
-                null,
                 null);
 
         if (cursor != null && cursor.moveToFirst()) {
@@ -973,7 +967,6 @@ public class Exchange1C {
                 null,
                 selection,
                 selectionArgs,
-                null,
                 null);
 
         if (cursor != null && cursor.moveToFirst()) {
@@ -1074,7 +1067,6 @@ public class Exchange1C {
                 null,
                 selection,
                 selectionArgs,
-                null,
                 null);
 
         if (cursor != null && cursor.moveToFirst()) {
